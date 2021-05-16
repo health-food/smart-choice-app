@@ -21,7 +21,6 @@ const operationsDoc = `
       fats
       name
       proteins
-      storage_conditions_info
       product_id
       weight
       preview_image_url

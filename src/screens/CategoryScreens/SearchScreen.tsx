@@ -4,6 +4,7 @@ import {useTheme} from 'react-navigation';
 import {useEffect, useState} from "react";
 import {Button, Card, Searchbar, Title} from "react-native-paper";
 import {FlatGrid, SectionGrid} from "react-native-super-grid";
+import {ProductList} from "./ProductList";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
@@ -15,16 +16,53 @@ const operationsDoc = `
   }
 `;
 
+const searchOperationsDoc = `
+  query MyQuery($_ilike: String) {
+    products(where: {name: {_ilike: $_ilike}}) {
+      name
+      barcode
+      preview_image_url
+      product_id
+    }
+  }
+`;
+
 export const SearchScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
     const [searchQuery, setSearchQuery] = React.useState('');
+    const [products, setProducts] = useState([]);
     const [categories, setCategories]: any = useState([{
         category_id: 0,
         image_url: '',
         name: '',
     }]);
-    const onCategoryClick = (id: number) => {
-        navigation.navigate('CategoryScreen', id);
+    const onCategoryClick = (id: number, name: string) => {
+        navigation.navigate('CategoryScreen', {id, name});
+    };
+
+    const onSearchInput = (query: string) => {
+        setSearchQuery(query);
+        fetch(
+            "http://64.225.106.248/v1/graphql",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
+                },
+                body: JSON.stringify({
+                    query: searchOperationsDoc,
+                    variables: {'_ilike': `%${query}%`},
+                    operationName: 'MyQuery'
+                })
+            }
+        )
+            .then((response) => response.json())
+            .then((json) => json.data)
+            .then((response) => {
+                setProducts(response.products);
+            })
+            .catch((error) => console.error(error))
     };
 
     useEffect(() => {
@@ -55,38 +93,29 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
         <View style={styles.background}>
             <Searchbar
                 placeholder="Поиск по продуктам"
-                onChangeText={(query) => setSearchQuery(query)}
+                onChangeText={(query) => onSearchInput(query)}
                 value={searchQuery}
-                style={styles.input} inputStyle={{ fontSize: 16 }}
+                style={styles.input} inputStyle={{fontSize: 16}}
             />
             <Text style={styles.categoryHeader}>Категории продуктов</Text>
-            <ScrollView style={styles.view}>
-                <FlatGrid data={categories} itemContainerStyle={{ }}
-                          spacing={10}
-                          style={styles.gridView}
-                          itemDimension={125}
-                          renderItem={({ item }) => (
-                              <Card key={item.category_id} style={styles.mainCard}
-                                    onPress={() => onCategoryClick(item.category_id)}>
-                                      <Card.Cover style={styles.image}
-                                                  source={{uri: item.image_url}}/>
-                                      {/*<Title>{item.name}</Title>*/}
-                              </Card>
-                          )}
-                />
-                {/*{*/}
-                {/*    categories.map(category => {*/}
-                {/*        return <Card key={category.category_id} style={styles.mainCard}*/}
-                {/*                     onPress={() => onCategoryClick(category.category_id)}>*/}
-                {/*            <Card.Content style={styles.header}>*/}
-                {/*                <Card.Cover style={styles.image}*/}
-                {/*                            source={{uri: category.image_url}}/>*/}
-                {/*                <Title>{category.name}</Title>*/}
-                {/*            </Card.Content>*/}
-                {/*        </Card>*/}
-                {/*    })*/}
-                {/*}*/}
-            </ScrollView>
+            {
+                searchQuery ? <ProductList products={products} navigation={navigation} /> :
+                    <ScrollView style={styles.view}>
+                        <FlatGrid data={categories} itemContainerStyle={{}}
+                                  spacing={10}
+                                  style={styles.gridView}
+                                  itemDimension={125}
+                                  renderItem={({item}) => (
+                                      <Card key={item.category_id} style={styles.mainCard}
+                                            onPress={() => onCategoryClick(item.category_id, item.name)}>
+                                          <Card.Cover style={styles.image}
+                                                      source={{uri: item.image_url}}/>
+                                          {/*<Title>{item.name}</Title>*/}
+                                      </Card>
+                                  )}
+                        />
+                    </ScrollView>
+            }
         </View>
     );
 };
@@ -176,5 +205,5 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         letterSpacing: -0.24,
         marginLeft: 8,
-}
+    }
 })

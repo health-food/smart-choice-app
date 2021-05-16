@@ -6,6 +6,7 @@ import {Button, Card, Paragraph, Title} from "react-native-paper";
 import {TabBar, TabView} from 'react-native-tab-view';
 import {OverviewRoute} from "../OverviewRoute";
 import {DetailsRoute} from "../DetailsRoute";
+import {ProductListByTagScreen} from "./ProductListByTagScreen";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
@@ -24,7 +25,7 @@ const operationsDoc = `
 
 const operationsDoc1 = `
   query MyQuery($_eq: bigint) {
-    tags(where: {catgory_id: {_eq: $_eq}}) {
+    tags(where: {category_id: {_eq: $_eq}}) {
       tag_id
       tag_name
     }
@@ -58,7 +59,7 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
                 },
                 body: JSON.stringify({
                     query: operationsDoc,
-                    variables: {'_eq': navigation.state.params},
+                    variables: {'_eq': navigation.state.params.id},
                     operationName: 'MyQuery'
                 })
             }
@@ -82,7 +83,7 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
                 },
                 body: JSON.stringify({
                     query: operationsDoc1,
-                    variables: {'_eq': navigation.state.params},
+                    variables: {'_eq': navigation.state.params.id},
                     operationName: 'MyQuery'
                 })
             }
@@ -90,6 +91,7 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
             .then((response) => response.json())
             .then((json) => json.data)
             .then((response) => {
+                console.log(response);
                 setTags(response.tags.map((tag: any) => {
                     return {
                         key: tag.tag_id,
@@ -101,22 +103,24 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
     }, []);
 
     const renderTabBar = (props: any) => (
-        <TabBar activeColor={'#000'} inactiveColor={'#8f8d8d'}
-                {...props}
-                indicatorStyle={{backgroundColor: '#44ae18'}}
-                style={{backgroundColor: '#F5FAFA', }}
-        />
+            <TabBar activeColor={'#44ae18'} inactiveColor={'#A8A8A8'} scrollEnabled={true}
+                    {...props}
+                    indicatorStyle={{backgroundColor: '#44ae18'}}
+                    style={{backgroundColor: '#F5FAFA'}}
+                    labelStyle={{fontWeight: '600'}}
+            />
     );
 
     const renderScene = ({route}: any) => {
         switch (route.key) {
             default:
-                return <Text>мы туть {route.title}</Text>;
+                return <ProductListByTagScreen route={route} navigation={navigation}/>
         }
     };
 
     return (
         <View style={styles.background}>
+            <Text style={styles.categoryTitle}>{navigation.state.params.name}</Text>
             <TabView renderTabBar={renderTabBar}
                      navigationState={{index, routes: tags}}
                      renderScene={renderScene}
@@ -158,6 +162,13 @@ const styles = StyleSheet.create({
     background: {
         backgroundColor: '#F5FAFA',
         height: '100%',
+    },
+    categoryTitle: {
+        fontWeight: "bold",
+        fontSize: 20,
+        marginTop: 24,
+        marginBottom: 16,
+        color: '#2E2E2E',
     },
     view: {
         marginTop: 12,
