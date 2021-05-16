@@ -3,33 +3,68 @@ import {ImageBackground, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {useTheme} from 'react-navigation';
 import {useEffect, useState} from "react";
 import {Button, Card, Paragraph, Title} from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useIsFocused} from "@react-navigation/native";
+import {useFocusEffect} from '@react-navigation/native';
 
 const operationsDoc = `
-  query MyQuery($_eq: bigint = "") {
-    categories(where: {category_id: {_eq: $_eq}}) {
-      category_id
+  query MyQuery($_in: [bigint!]) {
+    products(where: {barcode: {_in: $_in}}) {
       name
-      products {
-        preview_image_url
-        product_id
-        name
-        barcode
+      barcode
+      xref_product_2_components {
+        component {
+          component_id
+          component_name
+          image_url
+        }
       }
+      calories
+      carbs
+      composition
+      description
+      fats
+      preview_image_url
+      product_id
+      proteins
+      weight
     }
   }
 `;
 
-export const CategoryScreen = ({navigation, screenProps}: any) => {
+export const FavoritesScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
-    const [categories, setCategories] = useState({
-        category_id: 0,
-        image_url: '',
-        name: '',
-        products: [],
-    });
+    const [favorites, setFavorites]: any = useState([]);
+    const [products, setProducts]: any = useState([]);
+
+    const getFavoritesFromStorage = async () => {
+        try {
+            await AsyncStorage.getItem('favorites', (errs, result) => {
+                if (result !== null) {
+                    const favs: any[] = result?.split(',').map(x => +x) || [];
+                    console.log(favs);
+                    setFavorites(favs);
+                }
+            })
+        } catch (e) {
+            console.log(e);
+            // error reading value
+        }
+    };
+
     const onProductClick = (barcode: number) => {
         navigation.navigate('ProductScreen', barcode);
     };
+
+    useEffect(() => {
+        const didFocusSubscription = navigation.addListener(
+            'didFocus',
+            (payload: any) => {
+                getFavoritesFromStorage();
+            }
+        );
+        return didFocusSubscription;
+    }, []);
 
     useEffect(() => {
         fetch(
@@ -42,24 +77,20 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
                 },
                 body: JSON.stringify({
                     query: operationsDoc,
-                    variables: {'_eq': navigation.state.params},
+                    variables: {"_in": favorites},
                     operationName: 'MyQuery'
                 })
             }
         )
             .then((response) => response.json())
-            .then((json) => json.data)
-            .then((response) => {
-                setCategories(response.categories[0]);
-            })
-            .catch((error) => console.error(error))
-    }, []);
+            .then((json) => setProducts(json.data.products))
+    }, [favorites]);
 
     return (
-        <View>
+        <View style={styles.background}>
             <ScrollView style={styles.view}>
                 {
-                    categories.products.map((product: any) => {
+                    products.map((product: any) => {
                         return (
                             <Card key={product.product_id} style={styles.mainCard} onPress={() => onProductClick(product.barcode)}>
                                 <Card.Content style={styles.header}>
@@ -76,7 +107,23 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
     );
 };
 
+FavoritesScreen.navigationOptions = {
+    title: 'Избранное',
+    headerStyle: {
+        backgroundColor: '#F5FAFA',
+        borderColor: '#F5FAFA',
+        shadowRadius: 0,
+        shadowOffset: {
+            height: 0,
+        },
+    },
+}
+
 const styles = StyleSheet.create({
+    background: {
+        backgroundColor: '#F5FAFA',
+        height: '100%',
+    },
     view: {
         marginTop: 12,
     },

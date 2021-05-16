@@ -1,19 +1,20 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { createStackNavigator } from 'react-navigation-stack';
+import {createStackNavigator} from 'react-navigation-stack';
 
 // screens
 
 // icons
 import SvgHome from './Svg.Profile';
-import {ScanScreen} from "../screens/ScanScreen";
+import {ScanScreen} from "../screens/barcodeScreens/ScanScreen";
 import SvgScan from "./Svg.Scan";
 import {ProductScreen} from "../screens/ProductScreen";
+import colors from "../constants/colors";
 
-const HomeTabBarIcon = ({ focused }: any) => <SvgScan active={focused} />;
+const HomeTabBarIcon = ({focused}: any) => <SvgScan active={focused}/>;
 HomeTabBarIcon.propTypes = {
-    // required
-    focused: PropTypes.bool.isRequired
+    focused: PropTypes.bool.isRequired,
+    color: 'red',
 };
 
 const ScanStack = createStackNavigator(
@@ -23,8 +24,8 @@ const ScanStack = createStackNavigator(
     },
     {
         navigationOptions: {
-            tabBarLabel: 'Scan',
-            tabBarIcon: HomeTabBarIcon
+            tabBarLabel: 'Сканировать',
+            tabBarIcon: HomeTabBarIcon,
         }
     }
 );

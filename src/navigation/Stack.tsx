@@ -11,8 +11,9 @@ const StackNavigator = createStackNavigator(
     {
         headerMode: 'none',
         initialRouteName: 'TabNavigator',
-        mode: 'modal'
-    }
+        mode: 'modal',
+    },
+
 );
 
 const MainStack = createAppContainer(StackNavigator);

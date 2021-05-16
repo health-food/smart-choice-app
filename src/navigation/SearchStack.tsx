@@ -5,10 +5,11 @@ import { createStackNavigator } from 'react-navigation-stack';
 // screens
 
 // icons
-import {SearchScreen} from "../screens/SearchScreen";
+import {SearchScreen} from "../screens/CategoryScreens/SearchScreen";
 import SvgSearch from "./Svg.Search";
-import {CategoryScreen} from "../screens/CategoryScreen";
+import {CategoryScreen} from "../screens/CategoryScreens/CategoryScreen";
 import {ProductScreen} from "../screens/ProductScreen";
+import colors from "../constants/colors";
 
 const HomeTabBarIcon = ({ focused }: any) => <SvgSearch active={focused} />;
 HomeTabBarIcon.propTypes = {
@@ -24,10 +25,10 @@ const SearchStack = createStackNavigator(
     },
     {
         navigationOptions: {
-            tabBarLabel: 'Search',
-            tabBarIcon: HomeTabBarIcon
-        }
-    }
+            tabBarLabel: 'Каталог',
+            tabBarIcon: HomeTabBarIcon,
+        },
+    },
 );
 
 export default SearchStack;

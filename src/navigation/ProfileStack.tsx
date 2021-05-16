@@ -5,6 +5,7 @@ import SvgHome from './Svg.Profile';
 import {ProfileScreen} from "../screens/ProfileScreen";
 import {ChooseOptionsScreen} from "../screens/ChooseOptionsScreen";
 import {ProfileSettingsScreen} from "../screens/ProfileSettingsScreen";
+import colors from "../constants/colors";
 
 const HomeTabBarIcon = ({ focused }: any) => <SvgHome active={focused} />;
 HomeTabBarIcon.propTypes = {
@@ -20,8 +21,8 @@ const ProfileStack = createStackNavigator(
     },
     {
         navigationOptions: {
-            tabBarLabel: 'Profile',
-            tabBarIcon: HomeTabBarIcon
+            tabBarLabel: 'Профиль',
+            tabBarIcon: HomeTabBarIcon,
         }
     }
 );

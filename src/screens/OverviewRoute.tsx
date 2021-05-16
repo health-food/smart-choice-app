@@ -6,14 +6,17 @@ import {Background} from "../components/Background";
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-export const OverviewRoute = () => {
-    const good = {
+export const OverviewRoute = ({barcode}: any) => {
+    const good = barcode === 4607065714116 ? {
         key: 'good',
-        list: ['Low Cholesterol', 'Low Saturated Fat', 'Low Fat'],
+        list: ['Низкое содержание жира', 'Низкий уровень холестерина', 'Мало калорий'],
+    } : {
+        key: 'good',
+        list: ['Низкий уровень холестерина', 'Низкое содержание насыщенных жиров'],
     };
-    const bad = {
+    const bad = barcode === 4607065714116 ? {key: 'bad', list: []} :{
         key: 'bad',
-        list: ['Added sugar']
+        list: ['Добавленный сахар']
     };
 
     return (
@@ -21,7 +24,7 @@ export const OverviewRoute = () => {
             <View style={{display: "flex", flexDirection: "column"}}>
                 {
                     good.list.map(item =>
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
                             <Checkbox.IOS status={'checked'}
                                           color={'#41d773'}
                             />
@@ -33,7 +36,7 @@ export const OverviewRoute = () => {
             <View style={{display: "flex", flexDirection: "column"}}>
                 {
                     bad.list.map(item =>
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
                             <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
                             <Paragraph>{item}</Paragraph>
                         </View>

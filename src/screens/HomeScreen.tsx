@@ -25,16 +25,15 @@ export const HomeScreen = () => {
     //         />
     //     );
     // }
-
     return (
         <React.Fragment>
             <StatusBar barStyle={device.iOS ? iOSStatusType : 'light-content'}/>
 
             <Stack
                 screenProps={{
-                    updateTheme: (themeType: any) => setTheme(themeType)
+                    updateTheme: (themeType: any) => setTheme(themeType),
                 }}
-            />
+        />
         </React.Fragment>
     );
 }

@@ -1,8 +1,8 @@
 import React from 'react'
-import {Button} from "../components/Button";
+import {Button} from "../../components/Button";
 import {StyleSheet, KeyboardAvoidingView} from "react-native";
-import Logo from "../components/Logo";
-import Header from "../components/Header";
+import Logo from "../../components/Logo";
+import Header from "../../components/Header";
 
 const styles = StyleSheet.create({
     container: {

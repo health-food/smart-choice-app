@@ -2,73 +2,90 @@ import * as React from 'react';
 import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Card, Title, Paragraph, Button, Checkbox} from 'react-native-paper';
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const data = [
-    {
-        id: 0,
-        title: 'Eggs',
-        image: require('../../assets/logo.png'),
-        chosen: false,
-    },
-    {
-        id: 1,
-        title: 'Tree Nuts',
-        image: require('../../assets/logo.png'),
-        chosen: false,
-    },
-    {
-        id: 2,
-        title: 'Fish',
-        image: require('../../assets/logo.png'),
-        chosen: false,
-    },
-    {
-        id: 3,
-        title: 'Lactose',
-        image: require('../../assets/logo.png'),
-        chosen: true,
-    },
-    {
-        id: 4,
-        title: 'Gluten',
-        image: require('../../assets/logo.png'),
-        chosen: false,
-    },
-    {
-        id: 5,
-        title: 'Meat',
-        image: require('../../assets/logo.png'),
-        chosen: false,
-    },
-    {
-        id: 6,
-        title: 'Sesame',
-        image: require('../../assets/logo.png'),
-        chosen: false,
-    },
-];
+const operationsDoc = `
+  query MyQuery($_eq: bigint = "") {
+    components {
+      component_id
+      component_name
+      image_url
+    }
+  }
+`;
 
 export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
-    const [list, setList] = useState(data);
+    const [list, setList]: any = useState([]);
+    const [chosenList, setChosenList]: any = useState([]);
+
+    const getChosen = async () => {
+        // await AsyncStorage.removeItem('chosen_options');
+        try {
+            await AsyncStorage.getItem('chosen_options', (errs, result) => {
+                if (result !== null) {
+                    setChosenList(result ? result?.split(',').map(x=>+x) : []);
+                }
+            })
+
+        } catch (e) {
+            console.log(e);
+            // error reading value
+        }
+    };
+
+    useEffect(() => {
+        getChosen();
+            fetch(
+            "http://64.225.106.248/v1/graphql",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
+                },
+                body: JSON.stringify({
+                    query: operationsDoc,
+                    variables: {},
+                    operationName: 'MyQuery'
+                })
+            }
+        )
+            .then((response) => response.json())
+            .then((json) => json.data)
+            .then((response) => {
+                setList(response.components);
+            })
+            .catch((error) => console.error(error))
+    }, []);
+
+    const chosenToLocalStorage = async (itemId: number) => {
+        try {
+            if (chosenList?.find((chosen: number) => chosen === itemId)) {
+                setChosenList(chosenList.filter((item: any) => item !== itemId));
+                await AsyncStorage.setItem('chosen_options', chosenList ? chosenList.filter((item: any) => item !== itemId).join(',') : '')
+            } else {
+                setChosenList([...chosenList, itemId]);
+                await AsyncStorage.setItem('chosen_options', [...chosenList, itemId].join(','))
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     return (
         <View>
             <ScrollView style={styles.view}>
                 {
-                    list.map(item => (
-                        <View style={styles.card} key={item.id}>
+                    list.map((item: any) => (
+                        <View style={styles.card} key={item.component_id}>
                             <Image style={styles.image}
-                                   source={{uri: 'https://picsum.photos/700'}}/>
-                            <Paragraph>{item.title}</Paragraph>
+                                   source={{uri: item.image_url}}/>
+                            <Paragraph>{item.component_name}</Paragraph>
                             <Checkbox.IOS status={'checked'}
-                                          color={item.chosen ? '#41d773' : '#d0cfcf'}
-                                          onPress={() => {
-                                              setList(list.map(it => it.id === item.id ? {
-                                                  ...it, chosen: !it.chosen,
-                                              } : it));
-                                          }}
+                                          color={chosenList?.find((chosen: number) => chosen === item.component_id) ? '#41d773' : '#d0cfcf'}
+                                          onPress={() => chosenToLocalStorage(item.component_id)}
                             />
                         </View>
                     ))
@@ -79,7 +96,15 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
 };
 
 ChooseOptionsScreen.navigationOptions = {
-    title: 'Choose Options'
+    title: '',
+    headerStyle: {
+        backgroundColor: '#F5FAFA',
+        borderColor: '#F5FAFA',
+        shadowRadius: 0,
+        shadowOffset: {
+            height: 0,
+        },
+    },
 }
 
 const styles = StyleSheet.create({

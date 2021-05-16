@@ -123,7 +123,15 @@ export const ProfileSettingsScreen = () => {
 };
 
 ProfileSettingsScreen.navigationOptions = {
-    title: 'Настройки профиля'
+    title: 'Настройки профиля',
+    headerStyle: {
+        backgroundColor: '#F5FAFA',
+        borderColor: '#F5FAFA',
+        shadowRadius: 0,
+        shadowOffset: {
+            height: 0,
+        },
+    },
 }
 
 

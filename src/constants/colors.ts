@@ -13,7 +13,7 @@ export default {
     grey,
 
     activeTintColor: {
-        light: darkColor,
+        light: '#20AF40',
         dark: grey
     },
     inactiveTintColor: {

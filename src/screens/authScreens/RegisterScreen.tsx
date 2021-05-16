@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import {View, StyleSheet, TouchableOpacity, KeyboardAvoidingView} from 'react-native';
 import { Text } from 'react-native-paper';
-import Logo from '../components/Logo';
-import Header from '../components/Header';
-import {Button} from '../components/Button';
-import {TextInput} from '../components/TextInput';
-import {BackButton} from '../components/BackButton';
-import { emailValidator } from '../helpers/emailValidator';
-import { passwordValidator } from '../helpers/passwordValidator';
-import {theme} from "../theme";
-import {nameValidator} from "../helpers/nameValidator";
+import Logo from '../../components/Logo';
+import Header from '../../components/Header';
+import {Button} from '../../components/Button';
+import {TextInput} from '../../components/TextInput';
+import {BackButton} from '../../components/BackButton';
+import { emailValidator } from '../../helpers/emailValidator';
+import { passwordValidator } from '../../helpers/passwordValidator';
+import {theme} from "../../theme";
+import {nameValidator} from "../../helpers/nameValidator";
 
 export const RegisterScreen = ({ navigation }: any) => {
     const [name, setName] = useState({ value: '', error: '' })
