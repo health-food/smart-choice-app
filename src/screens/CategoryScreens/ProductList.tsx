@@ -58,7 +58,7 @@ ProductList.navigationOptions = {
 const styles = StyleSheet.create({
     background: {
         backgroundColor: '#F5FAFA',
-        height: '100%',
+        maxHeight: '80%',
     },
     categoryTitle: {
         fontWeight: "bold",

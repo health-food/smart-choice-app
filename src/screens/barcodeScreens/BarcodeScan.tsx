@@ -1,15 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, StyleSheet, Button, Image} from 'react-native';
+import {Text, View, StyleSheet, Alert} from 'react-native';
 import {BarCodeScanner} from 'expo-barcode-scanner';
 
 export const BarcodeScan = ({navigation}: any) => {
     const [hasPermission, setHasPermission]: any = useState(null);
-    const [scanned, setScanned] = useState(false);
+    const [scanned, setScanned] = useState(true);
 
     useEffect(() => {
         (async () => {
             const {status} = await BarCodeScanner.requestPermissionsAsync();
             setHasPermission(status === 'granted');
+            if (navigation.isFocused()) {
+                setScanned(false);
+            }
         })();
     }, []);
 
@@ -42,7 +45,14 @@ export const BarcodeScan = ({navigation}: any) => {
                 if (response?.products.length) {
                     navigation.navigate('ProductScreen', data);
                 } else {
-                    alert(`К сожалению, товар не найден`);
+                    // alert(`К сожалению, товар не найден`);
+                    Alert.alert(
+                        "К сожалению, товар не найден",
+                        "",
+                        [
+                            { text: "OK", onPress: () => setScanned(false)}
+                        ]
+                    );
                 }
             })
             .catch((error) => console.error(error))
@@ -57,19 +67,24 @@ export const BarcodeScan = ({navigation}: any) => {
 
     return (
         <View style={styles.container}>
-            <BarCodeScanner
-                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                style={[StyleSheet.absoluteFill, styles.container ]}
-            >
-                <View style={styles.layerTop}/>
-                <View style={styles.layerCenter}>
-                    <View style={styles.layerLeft}/>
-                    <View style={styles.focused}/>
-                    <View style={styles.layerRight}/>
-                </View>
-                <View style={styles.layerBottom}/>
-            </BarCodeScanner>
-            {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)}/>}
+            <Text style={styles.info}>Поместите штрих-код продукта в рамку.
+                Считывание произойдет автоматически.</Text>
+            <View style={styles.barCodeScanner}>
+                <BarCodeScanner
+                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    style={{flex: 1,}}
+                    // style={styles.barCodeScanner}
+                >
+                    <View style={styles.layerTop}/>
+                    <View style={styles.layerCenter}>
+                        <View style={styles.layerLeft}/>
+                        <View style={styles.focused}/>
+                        <View style={styles.layerRight}/>
+                    </View>
+                    <View style={styles.layerBottom}/>
+                </BarCodeScanner>
+                {/*{scanned && <Button title={'Tap to Scan'} onPress={() => setScanned(false)}/>}*/}
+            </View>
         </View>
     );
 };
@@ -79,10 +94,33 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'center',
+        backgroundColor: '#ffffff',
+        // justifyContent: 'center',
+    },
+    info: {
+        fontWeight: '500',
+        fontSize: 14,
+        lineHeight: 17,
+        textAlign: "center",
+        letterSpacing: -0.24,
+        color: '#2E2E2E',
+        marginTop: 20,
+        marginBottom: 20,
+        width: '80%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+    },
+    barCodeScanner: {
+        flex: 1,
+        marginRight: 30,
+        marginLeft: 30,
+        marginBottom: 130,
+        borderRadius: 5,
+        borderWidth: 2,
+        borderColor: opacity,
     },
     layerTop: {
-        flex: 2,
+        flex: 1,
         backgroundColor: opacity,
     },
     layerCenter: {
@@ -95,18 +133,16 @@ const styles = StyleSheet.create({
     },
     focused: {
         flex: 10,
-        borderRightWidth: 2,
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
-        borderLeftWidth: 2,
-        borderColor: '#c4c4c4',
+        borderWidth: 4,
+        borderColor: '#20AF40',
+        borderRadius: 15,
     },
     layerRight: {
         flex: 1,
         backgroundColor: opacity
     },
     layerBottom: {
-        flex: 2,
+        flex: 1,
         backgroundColor: opacity
     },
 });

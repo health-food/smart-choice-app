@@ -11,13 +11,19 @@ export const ScanScreen = ({ navigation, screenProps }: any) => {
 };
 
 ScanScreen.navigationOptions = {
-    title: 'Поиск по штрихкоду',
+    title: 'Сканер штрих-кода',
     headerStyle: {
-        backgroundColor: '#F5FAFA',
+        backgroundColor: '#FFFFFF',
         borderColor: '#F5FAFA',
         shadowRadius: 0,
         shadowOffset: {
             height: 0,
         },
     },
+    headerTintColor: '#20AF40',
+    headerTitleStyle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        letterSpacing: -0.24,
+    }
 }

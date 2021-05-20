@@ -18,7 +18,7 @@ const operationsDoc = `
 
 const searchOperationsDoc = `
   query MyQuery($_ilike: String) {
-    products(where: {name: {_ilike: $_ilike}}) {
+    products(where: {name: {_ilike: $_ilike}}, limit: 10, offset: 10) {
       name
       barcode
       preview_image_url
@@ -97,7 +97,7 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
                 value={searchQuery}
                 style={styles.input} inputStyle={{fontSize: 16}}
             />
-            <Text style={styles.categoryHeader}>Категории продуктов</Text>
+            {!searchQuery && <Text style={styles.categoryHeader}>Категории продуктов</Text>}
             {
                 searchQuery ? <ProductList products={products} navigation={navigation} /> :
                     <ScrollView style={styles.view}>

@@ -20,7 +20,15 @@ export const OverviewRoute = ({barcode}: any) => {
     };
 
     return (
-        <View style={{flex: 1, display: "flex", flexDirection: "row", justifyContent: "space-around", marginTop: 12,}}>
+        <View style={{flex: 1,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            backgroundColor: '#ffffff',
+            borderRadius: 10,
+            marginRight: 24,
+            marginLeft: 24,
+            marginTop: 18,}}>
             <View style={{display: "flex", flexDirection: "column"}}>
                 {
                     good.list.map(item =>

@@ -7,6 +7,7 @@ import {TabBar, TabView} from 'react-native-tab-view';
 import {OverviewRoute} from "../OverviewRoute";
 import {DetailsRoute} from "../DetailsRoute";
 import {ProductListByTagScreen} from "./ProductListByTagScreen";
+import {ProductListAllScreen} from "./ProductListAllScreen";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
@@ -91,7 +92,6 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
             .then((response) => response.json())
             .then((json) => json.data)
             .then((response) => {
-                console.log(response);
                 setTags(response.tags.map((tag: any) => {
                     return {
                         key: tag.tag_id,
@@ -121,6 +121,9 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
     return (
         <View style={styles.background}>
             <Text style={styles.categoryTitle}>{navigation.state.params.name}</Text>
+            {
+                tags.length === 0 && <ProductListAllScreen categoryId={navigation.state.params.id} navigation={navigation}/>
+            }
             <TabView renderTabBar={renderTabBar}
                      navigationState={{index, routes: tags}}
                      renderScene={renderScene}

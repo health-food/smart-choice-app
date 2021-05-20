@@ -1,8 +1,10 @@
-import {Text, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import * as React from "react";
 import ProgressCircle from 'react-native-progress-circle';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useEffect, useState} from "react";
+import {ProgressBar, Colors} from 'react-native-paper';
+import {ProgressBarComponent} from "./productScreen/ProgressBarComponent";
 
 export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => {
     const [calorieValue, setCalorieValue]: [number, any] = useState(2000);
@@ -40,52 +42,67 @@ export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => 
     return (
         <View style={{
             flex: 1,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            top: 25,
-            marginLeft: 14,
-            marginRight: 14,
         }}>
-            <View style={{display: 'flex', flexDirection: "column", alignItems: "center"}}>
-                <Text>Белки</Text>
-                <ProgressCircle
-                    percent={proteins * 100 / proteinsValue}
-                    radius={50}
-                    borderWidth={8}
-                    color="#3399FF"
-                    shadowColor="#999"
-                    bgColor="#fff"
-                >
-                    <Text style={{fontSize: 18}}>{`${Math.floor(proteins * 100 / proteinsValue)}%`}</Text>
-                </ProgressCircle>
-            </View>
-            <View style={{display: 'flex', flexDirection: "column", alignItems: "center"}}>
-                <Text>Жиры</Text>
-                <ProgressCircle
-                    percent={fats * 100 / fatsValue}
-                    radius={50}
-                    borderWidth={8}
-                    color="#3399FF"
-                    shadowColor="#999"
-                    bgColor="#fff"
-                >
-                    <Text style={{fontSize: 18}}>{`${Math.floor(fats * 100 / fatsValue)}%`}</Text>
-                </ProgressCircle>
-            </View>
-            <View style={{display: 'flex', flexDirection: "column", alignItems: "center"}}>
-                <Text>Углеводы</Text>
-                <ProgressCircle
-                    percent={carbs * 100 / carbsValue}
-                    radius={50}
-                    borderWidth={8}
-                    color="#3399FF"
-                    shadowColor="#999"
-                    bgColor="#fff"
-                >
-                    <Text style={{fontSize: 18}}>{`${Math.floor(carbs * 100 / carbsValue)}%`}</Text>
-                </ProgressCircle>
+            <View style={styles.calorieCard}>
+                <View style={{display: "flex", flexDirection: "row", marginTop: 24,}}>
+                    <Text style={styles.calorieHeader}>Энергетическая ценность</Text>
+                    <Text style={styles.calorieValue}>{calories} Ккал</Text>
+                </View>
+                <ProgressBarComponent name={'Белки'}
+                                      value={proteins}
+                                      percentage={proteins / proteinsValue}
+                                      color={'#62CB8E'}
+                                      backgroundColor={'#E6FAE1'}/>
+                <ProgressBarComponent name={'Жиры'}
+                                      value={fats}
+                                      percentage={fats / fatsValue}
+                                      color={'#71CBE5'}
+                                      backgroundColor={'#E1F4FA'}/>
+                <ProgressBarComponent name={'Углеводы'}
+                                      value={carbs}
+                                      percentage={carbs / carbsValue}
+                                      color={'#20AF40'}
+                                      backgroundColor={'#E6FAE1'}/>
+                                      <Text style={styles.valueInfo}>От суточной нормы</Text>
             </View>
         </View>
     )
 };
+
+const styles = StyleSheet.create({
+    view: {
+        flex: 1,
+        backgroundColor: '#F5FAFA',
+    },
+    calorieCard: {
+        backgroundColor: '#ffffff',
+        display: 'flex',
+        marginLeft: 24,
+        marginRight: 24,
+        marginTop: 18,
+        borderRadius: 10,
+        height: 260,
+    },
+    calorieHeader: {
+        color: '#2E2E2E',
+        fontWeight: '600',
+        fontSize: 14,
+        letterSpacing: -0.24,
+        marginLeft: 8,
+    },
+    calorieValue: {
+        color: '#A8A8A8',
+        fontSize: 14,
+        lineHeight: 22,
+        fontWeight: '600',
+        marginLeft: 14,
+    },
+    valueInfo: {
+        color: '#A8A8A8',
+        fontSize: 12,
+        fontWeight: '600',
+        textAlign: "right",
+        right: 8,
+        top: 8,
+    },
+})

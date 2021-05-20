@@ -9,12 +9,14 @@ import {DetailsRoute} from "../DetailsRoute";
 import {ProductList} from "./ProductList";
 
 const operationsDoc = `
- query MyQuery($_eq: bigint) {
-    products(where: {category: {tags: {tag_id: {_eq: $_eq}}}}) {
-      name
-      preview_image_url
-      product_id
-      barcode
+  query MyQuery($_eq: bigint = "") {
+    xref_tag_2_product(where: {tag_id: {_eq: $_eq}}, limit: 10, offset: 10) {
+      product {
+        barcode
+        name
+        product_id
+        preview_image_url
+      }
     }
   }
 `;
@@ -22,10 +24,6 @@ const operationsDoc = `
 export const ProductListByTagScreen = ({navigation, route }: any) => {
     const theme = useTheme();
     const [products, setProducts]: any = useState([]);
-
-    const onProductClick = (barcode: number) => {
-        navigation.navigate('ProductScreen', barcode);
-    };
 
     useEffect(() => {
         fetch(
@@ -46,7 +44,7 @@ export const ProductListByTagScreen = ({navigation, route }: any) => {
             .then((response) => response.json())
             .then((json) => json.data)
             .then((response) => {
-                setProducts(response.products);
+                setProducts(response.xref_tag_2_product.map((product: any) => product.product));
             })
             .catch((error) => console.error(error))
     }, []);

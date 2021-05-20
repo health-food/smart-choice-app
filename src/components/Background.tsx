@@ -1,7 +1,6 @@
-import {ImageBackground, StyleSheet, KeyboardAvoidingView, Dimensions} from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient'
+import {Dimensions, StyleSheet, View} from 'react-native'
+import {LinearGradient} from 'expo-linear-gradient'
 import React from 'react'
-import { View } from 'react-native'
 
 export const Background = ({ children } : {children: any}) => {
     return (
