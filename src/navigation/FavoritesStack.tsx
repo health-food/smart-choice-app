@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {createStackNavigator} from 'react-navigation-stack';
-import {ProductScreen} from "../screens/ProductScreen";
+import {ProductScreen} from "../screens/productScreen/ProductScreen";
 import SvgFavorite from "./Svg.Favorite";
 import {FavoritesScreen} from "../screens/favoritesScreen/FavoritesScreen";
 import colors from "../constants/colors";

@@ -4,8 +4,8 @@ import {useTheme} from 'react-navigation';
 import {useEffect, useState} from "react";
 import {Button, Card, Paragraph, Title} from "react-native-paper";
 import {TabBar, TabView} from 'react-native-tab-view';
-import {OverviewRoute} from "../OverviewRoute";
-import {DetailsRoute} from "../DetailsRoute";
+import {OverviewRoute} from "../productScreen/OverviewRoute";
+import {DetailsRoute} from "../productScreen/DetailsRoute";
 import {ProductList} from "./ProductList";
 
 const operationsDoc = `

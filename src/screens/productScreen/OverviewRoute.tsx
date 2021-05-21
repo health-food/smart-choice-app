@@ -2,7 +2,7 @@ import * as React from 'react';
 import {ScrollView, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Card, Title, Paragraph, Button, Checkbox} from 'react-native-paper';
-import {Background} from "../components/Background";
+import {Background} from "../../components/Background";
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/AntDesign';
 

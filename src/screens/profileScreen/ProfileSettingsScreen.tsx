@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {TextInput} from 'react-native';
 import {Button} from 'react-native-paper';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {HeightWeightInput} from "./profileScreen/HeightWeightInput";
-import {GenderRadioButton} from "./profileScreen/GenderRadioButton";
+import {HeightWeightInput} from "./HeightWeightInput";
+import {GenderRadioButton} from "./GenderRadioButton";
 
 export const ProfileSettingsScreen = () => {
     const [name, setName]: [string, any] = useState('');

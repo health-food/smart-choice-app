@@ -4,8 +4,8 @@ import {Image, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Button, Card, Title} from 'react-native-paper';
 import {TabBar, TabView} from 'react-native-tab-view';
-import {OverviewRoute} from "./OverviewRoute";
-import {DetailsRoute} from "./DetailsRoute";
+import {OverviewRoute} from "./productScreen/OverviewRoute";
+import {DetailsRoute} from "./productScreen/DetailsRoute";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 

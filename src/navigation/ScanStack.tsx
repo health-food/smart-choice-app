@@ -8,7 +8,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 import SvgHome from './Svg.Profile';
 import {ScanScreen} from "../screens/barcodeScreens/ScanScreen";
 import SvgScan from "./Svg.Scan";
-import {ProductScreen} from "../screens/ProductScreen";
+import {ProductScreen} from "../screens/productScreen/ProductScreen";
 import colors from "../constants/colors";
 
 const HomeTabBarIcon = ({focused}: any) => <SvgScan active={focused}/>;

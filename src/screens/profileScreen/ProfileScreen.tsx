@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Button, Card, Paragraph, Title} from 'react-native-paper';
-import {Background} from "../components/Background";
+import {Background} from "../../components/Background";
 import Icon from 'react-native-vector-icons/Feather';
 import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,27 +15,27 @@ const data = [
             {
                 id: 0,
                 title: 'High Cholesterol',
-                image: require('../../assets/logo.png')
+                image: require('../../../assets/logo.png')
             },
             {
                 id: 1,
                 title: 'Gluten Intolerance',
-                image: require('../../assets/logo.png')
+                image: require('../../../assets/logo.png')
             },
             {
                 id: 2,
                 title: 'Vegetarian',
-                image: require('../../assets/logo.png')
+                image: require('../../../assets/logo.png')
             },
             {
                 id: 3,
                 title: 'Vegan',
-                image: require('../../assets/logo.png')
+                image: require('../../../assets/logo.png')
             },
             {
                 id: 4,
                 title: 'Heart Healthy',
-                image: require('../../assets/logo.png')
+                image: require('../../../assets/logo.png')
             },
         ],
     },

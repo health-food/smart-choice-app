@@ -1,11 +1,9 @@
 import * as React from 'react';
-import {ImageBackground, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useTheme} from 'react-navigation';
-import {useEffect, useState} from "react";
-import {Button, Card, Paragraph, Title} from "react-native-paper";
+import {useEffect, useState} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {Button, Card, Title} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useIsFocused} from "@react-navigation/native";
-import {useFocusEffect} from '@react-navigation/native';
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const operationsDoc = `
   query MyQuery($_in: [bigint!]) {
@@ -19,41 +17,32 @@ const operationsDoc = `
           image_url
         }
       }
-      calories
-      carbs
-      composition
-      description
-      fats
       preview_image_url
       product_id
-      proteins
-      weight
     }
   }
 `;
 
 export const FavoritesScreen = ({navigation, screenProps}: any) => {
-    const theme = useTheme();
     const [favorites, setFavorites]: any = useState([]);
     const [products, setProducts]: any = useState([]);
+
+    const onProductClick = (barcode: number) => {
+        navigation.navigate('ProductScreen', barcode);
+    };
 
     const getFavoritesFromStorage = async () => {
         try {
             await AsyncStorage.getItem('favorites', (errs, result) => {
                 if (result !== null) {
                     const favs: any[] = result?.split(',').map(x => +x) || [];
-                    console.log(favs);
                     setFavorites(favs);
                 }
-            })
+            }).then()
         } catch (e) {
             console.log(e);
             // error reading value
         }
-    };
-
-    const onProductClick = (barcode: number) => {
-        navigation.navigate('ProductScreen', barcode);
     };
 
     useEffect(() => {
@@ -64,6 +53,10 @@ export const FavoritesScreen = ({navigation, screenProps}: any) => {
             }
         );
         return didFocusSubscription;
+    }, []);
+
+    useEffect(() => {
+        getFavoritesFromStorage();
     }, []);
 
     useEffect(() => {
@@ -86,16 +79,34 @@ export const FavoritesScreen = ({navigation, screenProps}: any) => {
             .then((json) => setProducts(json.data.products))
     }, [favorites]);
 
+    const onFavClick = async (item: number) => {
+        const favs = favorites.filter((barCode: number) => barCode !== item);
+        const productList = products.filter((product: any) => product.barcode !== item);
+        // setFavorites(favs);
+        console.log('favs', favs);
+        console.log('productList', productList);
+        setProducts(productList);
+        await AsyncStorage.setItem('favorites', favs.join(','));
+        console.log(await  AsyncStorage.getItem('favorites'));
+    };
+
     return (
         <View style={styles.background}>
+            {/*<ProductList navigation={navigation} products={products} />*/}
             <ScrollView style={styles.view}>
                 {
                     products.map((product: any) => {
                         return (
-                            <Card key={product.product_id} style={styles.mainCard} onPress={() => onProductClick(product.barcode)}>
+                            <Card key={product.product_id} style={styles.mainCard}
+                                  onPress={() => onProductClick(product.barcode)}>
                                 <Card.Content style={styles.header}>
                                     <Card.Cover style={styles.image}
                                                 source={{uri: product.preview_image_url}}/>
+                                    <Button onPress={() => onFavClick(product.barcode)}
+                                            style={{width: 20, right: 6, top: -14,}}>
+                                        <Icon name={'bookmark'} size={26} style={{display: 'flex'}}
+                                              color={'#4eae14'}/>
+                                    </Button>
                                     <Title style={{fontSize: 16, width: 200}}>{product.name}</Title>
                                 </Card.Content>
                             </Card>

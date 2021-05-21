@@ -2,7 +2,8 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {useTheme} from 'react-navigation';
-import {Card, Title} from "react-native-paper";
+import {Button, Card, Title} from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const operationsDoc = `
  query MyQuery($_eq: bigint) {
@@ -16,8 +17,6 @@ const operationsDoc = `
 `;
 
 export const ProductList = ({navigation, products }: any) => {
-    const theme = useTheme();
-
     const onProductClick = (barcode: number) => {
         navigation.navigate('ProductScreen', barcode);
     };

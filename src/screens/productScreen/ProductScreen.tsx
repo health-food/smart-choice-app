@@ -9,7 +9,7 @@ import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import SvgAvoid from "./Svg.Avoid";
+import SvgAvoid from "../Svg.Avoid";
 
 const operationsDoc = `
  query MyQuery($_eq: bigint = "") {
@@ -34,7 +34,8 @@ const operationsDoc = `
 `;
 
 const IngredientsRoute = ({ingredients}: any) => (
-    <View style={{flex: 1, backgroundColor: '#ffffff', marginTop: 18, borderRadius: 10, marginLeft: 24, marginRight: 24 }}>
+    <View
+        style={{flex: 1, backgroundColor: '#ffffff', marginTop: 18, borderRadius: 10, marginLeft: 24, marginRight: 24}}>
         <Text style={{marginRight: 8, marginLeft: 8, marginTop: 8, fontSize: 15, lineHeight: 18,}}>
             {ingredients}
         </Text>
@@ -111,7 +112,7 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
                 }
             })
         } catch (e) {
-            console.log(e);
+            console.error(e);
             // error reading value
         }
     };
@@ -153,6 +154,16 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
             .catch((error) => console.error('2', error))
     }, [navigation.state.params]);
 
+    useEffect(() => {
+        const didFocusSubscription = navigation.addListener(
+            'didFocus',
+            (payload: any) => {
+                getData();
+            }
+        );
+        return () => didFocusSubscription.remove();
+    }, []);
+
     const found = data?.xref_product_2_components?.some((r: any) => chosenList?.includes(r?.component?.component_id));
 
     return (
@@ -165,21 +176,23 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
                     textAlign: "center"
                 }}>{data.name}</Title>
                 {found && <View style={styles.avoid}>
-                    <SvgAvoid />
-                    <Text style={{color: '#FE6F1C', fontSize: 16, fontWeight: "bold", }}>НЕ РЕКОМЕНДОВАНО</Text>
+                    <SvgAvoid/>
+                    <Text style={{color: '#FE6F1C', fontSize: 16, fontWeight: "bold",}}>НЕ РЕКОМЕНДОВАНО</Text>
                 </View>
                 }
-                <View style={{display: "flex",
+                <View style={{
+                    display: "flex",
                     marginTop: 14,
                     marginBottom: 20,
                     flexDirection: "row",
                     // justifyContent: "center",
                     marginLeft: 'auto',
                     marginRight: 'auto',
-                    alignItems: "flex-start"}}>
+                    alignItems: "flex-start"
+                }}>
                     <Image source={{uri: data.preview_image_url}}
                            style={styles.image}/>
-                    <Button onPress={onFavClick} style={{width: 20, right: 6, top: -14, }}>
+                    <Button onPress={onFavClick} style={{width: 20, right: 6, top: -14,}}>
                         <Icon name={'bookmark'} size={26} style={{display: 'flex'}}
                               color={isFav ? '#4eae14' : '#c1c1c1'}/>
                     </Button>
@@ -214,8 +227,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5FAFA',
     },
-    card: {
-    },
+    card: {},
     header: {
         display: "flex",
         flexDirection: "row",

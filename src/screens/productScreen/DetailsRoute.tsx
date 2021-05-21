@@ -4,7 +4,7 @@ import ProgressCircle from 'react-native-progress-circle';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useEffect, useState} from "react";
 import {ProgressBar, Colors} from 'react-native-paper';
-import {ProgressBarComponent} from "./productScreen/ProgressBarComponent";
+import {ProgressBarComponent} from "./ProgressBarComponent";
 
 export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => {
     const [calorieValue, setCalorieValue]: [number, any] = useState(2000);

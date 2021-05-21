@@ -8,7 +8,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import {SearchScreen} from "../screens/CategoryScreens/SearchScreen";
 import SvgSearch from "./Svg.Search";
 import {CategoryScreen} from "../screens/CategoryScreens/CategoryScreen";
-import {ProductScreen} from "../screens/ProductScreen";
+import {ProductScreen} from "../screens/productScreen/ProductScreen";
 import colors from "../constants/colors";
 
 const HomeTabBarIcon = ({ focused }: any) => <SvgSearch active={focused} />;
