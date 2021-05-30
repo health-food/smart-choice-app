@@ -5,52 +5,135 @@ import {Card, Title, Paragraph, Button, Checkbox} from 'react-native-paper';
 import {Background} from "../../components/Background";
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {useEffect, useState} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const OverviewRoute = ({barcode}: any) => {
-    const good = barcode === 4607065714116 ? {
-        key: 'good',
-        list: ['Низкое содержание жира', 'Низкий уровень холестерина', 'Мало калорий'],
-    } : {
-        key: 'good',
-        list: ['Низкий уровень холестерина', 'Низкое содержание насыщенных жиров'],
+export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, proteins, calories}: any) => {
+    const [calorieValue, setCalorieValue]: [number | undefined, any] = useState();
+    const [carbsValue, setCarbsValue]: [number | undefined, any] = useState();
+    const [fatsValue, setFatsValue]: [number | undefined, any] = useState();
+    const [proteinsValue, setProteinsValue]: [number | undefined, any] = useState();
+    const [chosenList, setChosenList]: any = useState([]);
+    const [good, setGoods]: any = useState([]);
+    const [bad, setBad]: any = useState([]);
+
+    const getData = async () => {
+        try {
+            await AsyncStorage.getItem('calories', (errs, result) => {
+                if (result !== undefined) {
+                    setCalorieValue(parseInt(result));
+                    setProteinsValue(Math.floor(parseInt(result) * 0.3 / 4));
+                    setFatsValue(Math.floor(parseInt(result) * 0.3 / 9));
+                    setCarbsValue(Math.floor(parseInt(result) * 0.4 / 4));
+                } else {
+                    setCalorieValue(2000);
+                    setProteinsValue(150);
+                    setFatsValue(67);
+                    setCarbsValue(200);
+                }
+            });
+            await AsyncStorage.getItem('chosen_options', (errs, result) => {
+                if (result !== null) {
+                    setChosenList(result ? result?.split(',').map(x => +x) : []);
+                }
+            })
+        } catch (e) {
+            console.log(e);
+            // error reading value
+        }
     };
-    const bad = barcode === 4607065714116 ? {key: 'bad', list: []} :{
-        key: 'bad',
-        list: ['Добавленный сахар']
-    };
+
+    // useEffect(() => {
+    // }, [carbs, fats, proteins, calories]);
+
+    useEffect(() => {
+        getData();
+        setGoods(baseComponent.filter((component: any) => component.component.type === 'GOOD'));
+        setBad(baseComponent.filter((component: any) => component.component.type === 'BAD'));
+    }, []);
+    console.log('___');
+    console.log(typeof calories);
+    console.log(calories);
 
     return (
-        <View style={{flex: 1,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
+        <View style={{
+            flex: 1,
             backgroundColor: '#ffffff',
             borderRadius: 10,
             marginRight: 24,
             marginLeft: 24,
-            marginTop: 18,}}>
-            <View style={{display: "flex", flexDirection: "column"}}>
+            marginTop: 18,
+        }}>
+            <ScrollView style={{display: "flex", flexDirection: "column"}}>
                 {
-                    good.list.map(item =>
+                    good?.map((item: any) =>
                         <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
                             <Checkbox.IOS status={'checked'}
                                           color={'#41d773'}
                             />
-                            <Paragraph>{item}</Paragraph>
+                            <Paragraph>{item?.component?.component_name}</Paragraph>
                         </View>
                     )
                 }
-            </View>
-            <View style={{display: "flex", flexDirection: "column"}}>
+                {fatsValue && fats / fatsValue < 0.07 &&
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                            <Checkbox.IOS status={'checked'}
+                                          color={'#41d773'}
+                            />
+                            <Paragraph>Пониженное содержание жиров</Paragraph>
+                        </View>
+                }
+                {proteinsValue && proteins / proteinsValue >= 0.05 &&
+                <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                    <Checkbox.IOS status={'checked'}
+                                  color={'#41d773'}
+                    />
+                    <Paragraph>Наличие белка</Paragraph>
+                </View>
+                }
+                {calories < 40 &&
+                <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                    <Checkbox.IOS status={'checked'}
+                                  color={'#41d773'}
+                    />
+                    <Paragraph>Пониженное содержание калорий</Paragraph>
+                </View>
+                }
                 {
-                    bad.list.map(item =>
+                    bad?.map((item: any) =>
                         <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
                             <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
-                            <Paragraph>{item}</Paragraph>
+                            <Paragraph>{item?.component?.component_name}</Paragraph>
                         </View>
                     )
                 }
-            </View>
+                {
+                    found?.map((item: any) =>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
+                            <Paragraph>{item?.component?.component_name}</Paragraph>
+                        </View>
+                    )
+                }
+                {
+                    fatsValue && fats / fatsValue >= 0.2 &&
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
+                            <Paragraph>Повышенное содержание жиров</Paragraph>
+                        </View>
+                }
+            </ScrollView>
+            {/*<View style={{display: "flex", flexDirection: "column"}}>*/}
+            {/*    {*/}
+            {/*        bad.list.map(item =>*/}
+            {/*            <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>*/}
+            {/*                <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>*/}
+            {/*                <Paragraph>{item}</Paragraph>*/}
+            {/*            </View>*/}
+            {/*        )*/}
+            {/*    }*/}
+            {/*</View>*/}
         </View>
     )
-};
+}
+;

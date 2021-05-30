@@ -6,6 +6,7 @@ import {ProfileScreen} from "../screens/profileScreen/ProfileScreen";
 import {ChooseOptionsScreen} from "../screens/ChooseOptionsScreen";
 import {ProfileSettingsScreen} from "../screens/profileScreen/ProfileSettingsScreen";
 import colors from "../constants/colors";
+import {DietOptionsScreen} from "../screens/profileScreen/DietOptionsScreen";
 
 const HomeTabBarIcon = ({ focused }: any) => <SvgHome active={focused} />;
 HomeTabBarIcon.propTypes = {
@@ -17,6 +18,7 @@ const ProfileStack = createStackNavigator(
     {
         Home: ProfileScreen,
         ChooseOptions: ChooseOptionsScreen,
+        DietOptions: DietOptionsScreen,
         ProfileSetting: ProfileSettingsScreen,
     },
     {

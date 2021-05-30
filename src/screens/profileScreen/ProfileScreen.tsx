@@ -1,57 +1,31 @@
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Button, Card, Paragraph, Title} from 'react-native-paper';
 import {Background} from "../../components/Background";
 import Icon from 'react-native-vector-icons/Feather';
-import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const data = [
-    {
-        id: 1,
-        title: 'Тип питания',
-        list: [
-            {
-                id: 0,
-                title: 'High Cholesterol',
-                image: require('../../../assets/logo.png')
-            },
-            {
-                id: 1,
-                title: 'Gluten Intolerance',
-                image: require('../../../assets/logo.png')
-            },
-            {
-                id: 2,
-                title: 'Vegetarian',
-                image: require('../../../assets/logo.png')
-            },
-            {
-                id: 3,
-                title: 'Vegan',
-                image: require('../../../assets/logo.png')
-            },
-            {
-                id: 4,
-                title: 'Heart Healthy',
-                image: require('../../../assets/logo.png')
-            },
-        ],
-    },
-    {
-        id: 2,
-        title: 'Хочу включить в рацион',
-        list: [],
-    },
-];
+import {err} from "react-native-svg/lib/typescript/xml";
 
 const operationsDoc = `
-  query MyQuery($_eq: bigint = "") {
-    components {
+  query MyQuery {
+    components(where: {type: {_eq: ALLERGEN}}) {
       component_id
       component_name
       image_url
+    }
+    diets {
+      diet_id
+      image_url
+      name
+      xref_diet_2_components {
+        component {
+          component_id
+          component_name
+          image_url
+        }
+      }
     }
   }
 `;
@@ -61,22 +35,35 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
     const onEditPress = (id: number) => {
         navigation.navigate('ChooseOptions');
     };
+    const onDietPress = () => {
+        navigation.navigate('DietOptions');
+    };
     const onEditProfileClick = () => {
         navigation.navigate('ProfileSetting');
     };
 
-    const [list, setList]: any = useState([]);
-    const [chosenList, setChosenList]: any = useState([]);
+    const [components, setComponents]: any = useState([]);
+    const [diets, setDiets]: any = useState([]);
+    const [componentList, setComponentList]: any = useState([]);
+    const [dietList, setDietList]: any = useState([]);
 
     const getChosen = async () => {
         // await AsyncStorage.removeItem('chosen_options');
         try {
             await AsyncStorage.getItem('chosen_options', (errs, result) => {
                 if (result !== null) {
-                    setChosenList(result ? result?.split(',').map(x => +x) : []);
+                    setComponentList(result ? result?.split(',').map(x => +x) : []);
+                } else {
+                    setComponentList([]);
                 }
             })
-
+            await AsyncStorage.getItem('chosen_diets', (errs, result) => {
+                if (result !== null) {
+                    setDietList(result ? result?.split(',').map(x => +x) : []);
+                } else {
+                    setDietList([]);
+                }
+            })
         } catch (e) {
             console.log(e);
             // error reading value
@@ -103,10 +90,52 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
             .then((response) => response.json())
             .then((json) => json.data)
             .then((response) => {
-                setList(response.components);
+                setComponents(response.components);
+                setDiets(response.diets);
             })
-            .catch((error) => console.error(error))
-    }, []);
+            .catch((error) => console.error(error));
+        }, []);
+
+    useEffect(() => {
+        const addListener = navigation.addListener('didFocus', async (payload: any) => {
+            console.log('didFocus', payload)
+            await getChosen();
+        });
+        return () => addListener.remove();
+    }, [navigation]);
+
+
+    function getDiets() {
+        const filteredDiets = diets.filter((diet: any) => dietList.find((chosen: any) => chosen === diet.diet_id));
+        if (filteredDiets.length === 0) {
+            return <Text>Nothing is selected yet</Text>;
+        }
+        return filteredDiets.map((product: any) => {
+            return (
+                <Card style={styles.product} key={product.diet_id}>
+                    <Card.Cover style={styles.image}
+                                source={{uri: product.image_url}}/>
+                    <Paragraph>{product.name}</Paragraph>
+                </Card>
+            )
+        });
+    }
+
+    function getComponents() {
+        const filteredComponents = components.filter((component: any) => componentList.find((chosen: any) => chosen === component.component_id));
+        if (filteredComponents.length === 0) {
+            return <Text>Nothing is selected yet</Text>;
+        }
+        return filteredComponents.map((product: any) => {
+                    return (
+                        <Card style={styles.product} key={product.id}>
+                            <Card.Cover style={styles.image}
+                                        source={{uri: product.image_url}}/>
+                            <Paragraph>{product.component_name}</Paragraph>
+                        </Card>
+                    )
+                });
+    }
 
     return (
         <View style={styles.background}>
@@ -118,8 +147,10 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
                             style={styles.profileImage}/>
                         <Button color={'#fff'} compact mode={'text'}
                                 onPress={onEditProfileClick}
-                                icon={() => <Icon name={'edit'} size={20} color={'#fff'}/>}
-                                style={{marginTop: 6}}>Мои данные</Button>
+                                icon={() => <Icon name={'edit'} size={20} color={'#000000'}/>}
+                                style={{marginTop: 6,}}>
+                            <Text style={{color: '#000000'}}>Мои данные</Text>
+                        </Button>
                     </View>
                 </Background>
                 <Card style={styles.mainCard}>
@@ -136,58 +167,35 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
 
                     <Card.Content>
                         <ScrollView horizontal={true}>
-                            {
-                                list.length ? list.map((product: any) => {
-                                    return chosenList?.find((chosen: number) => chosen === product.component_id) && (
-                                        <Card style={styles.product} key={product.id}>
-                                            <Card.Cover style={styles.image}
-                                                        source={{uri: product.image_url}}/>
-                                            <Paragraph>{product.component_name}</Paragraph>
-                                        </Card>
-                                    )
-                                }) : <Text>Nothing is selected yet</Text>
-                            }
+                            {getComponents()}
                         </ScrollView>
                     </Card.Content>
                 </Card>
-                {
-                    data.map(item => (
-                        <Card key={item.id} style={styles.mainCard}>
-                            <Card.Content style={styles.header}>
-                                <Title>{item.title}</Title>
-                                <Card.Actions>
-                                    <Button onPress={() => onEditPress(item.id)}>
-                                        <Text style={{fontSize: 14}}>
-                                            Изменить
-                                        </Text>
-                                    </Button>
-                                </Card.Actions>
-                            </Card.Content>
+                <Card style={styles.mainCard}>
+                    <Card.Content style={styles.header}>
+                        <Title>Тип питания</Title>
+                        <Card.Actions>
+                            <Button onPress={onDietPress}>
+                                <Text style={{fontSize: 14}}>
+                                    Изменить
+                                </Text>
+                            </Button>
+                        </Card.Actions>
+                    </Card.Content>
 
-                            <Card.Content>
-                                <ScrollView horizontal={true}>
-                                    {
-                                        item.list.length ? item.list.map(product => (
-                                                <Card style={styles.product} key={product.id}>
-                                                    <Card.Cover style={styles.image}
-                                                                source={{uri: 'https://picsum.photos/700'}}/>
-                                                    <Paragraph>{product.title}</Paragraph>
-                                                </Card>
-                                            )
-                                        ) : <Text>Nothing is selected yet</Text>
-                                    }
-                                </ScrollView>
-                            </Card.Content>
-                        </Card>
-                    ))
-                }
+                    <Card.Content>
+                        <ScrollView horizontal={true}>
+                            {getDiets()}
+                        </ScrollView>
+                    </Card.Content>
+                </Card>
             </ScrollView>
         </View>
     );
 };
 
 ProfileScreen.navigationOptions = {
-    title: 'Профиль',
+    title: '',
     headerTitleStyle: {fontFamily: "San Francisco"},
     headerStyle: {
         backgroundColor: '#F5FAFA',

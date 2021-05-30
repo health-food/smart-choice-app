@@ -1,9 +1,6 @@
 import {StyleSheet, Text, View} from "react-native";
 import * as React from "react";
-import ProgressCircle from 'react-native-progress-circle';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useEffect, useState} from "react";
-import {ProgressBar, Colors} from 'react-native-paper';
+import {ProgressBar} from 'react-native-paper';
 
 export const ProgressBarComponent = ({value, percentage, name}: any) => {
     const whatColor = () => {

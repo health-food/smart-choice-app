@@ -17,6 +17,9 @@ export const BarcodeScan = ({navigation}: any) => {
     }, []);
 
     const handleBarCodeScanned = ({type, data}: any) => {
+        if (type === 'org.iso.QRCode') {
+            return;
+        }
         setScanned(true);
         fetch(
             "http://64.225.106.248/v1/graphql",

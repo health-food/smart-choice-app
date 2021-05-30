@@ -25,5 +25,5 @@ ScanScreen.navigationOptions = {
         fontSize: 24,
         fontWeight: 'bold',
         letterSpacing: -0.24,
-    }
+    },
 }

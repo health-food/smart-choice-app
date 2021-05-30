@@ -59,13 +59,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5FAFA',
         maxHeight: '80%',
     },
-    categoryTitle: {
-        fontWeight: "bold",
-        fontSize: 20,
-        marginTop: 24,
-        marginBottom: 16,
-        color: '#2E2E2E',
-    },
     view: {
         marginTop: 12,
     },

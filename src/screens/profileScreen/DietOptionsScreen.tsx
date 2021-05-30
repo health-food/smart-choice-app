@@ -6,26 +6,39 @@ import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const operationsDoc = `
-  query MyQuery($_eq: bigint = "") {
-    components {
-      component_id
-      component_name
+  query MyQuery {
+    diets {
+      diet_id
       image_url
+      name
+      xref_diet_2_components {
+        component {
+          component_id
+          component_name
+          image_url
+        }
+      }
     }
   }
 `;
 
-export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
+export const DietOptionsScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
     const [list, setList]: any = useState([]);
-    const [chosenList, setChosenList]: any = useState([]);
+    const [componentList, setComponentList]: any = useState([]);
+    const [dietList, setDietList]: any = useState([]);
 
     const getChosen = async () => {
         // await AsyncStorage.removeItem('chosen_options');
         try {
             await AsyncStorage.getItem('chosen_options', (errs, result) => {
                 if (result !== null) {
-                    setChosenList(result ? result?.split(',').map(x=>+x) : []);
+                    setComponentList(result ? result?.split(',').map(x=>+x) : []);
+                }
+            })
+            await AsyncStorage.getItem('chosen_diets', (errs, result) => {
+                if (result !== null) {
+                    setDietList(result ? result?.split(',').map(x=>+x) : []);
                 }
             })
 
@@ -55,37 +68,45 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
             .then((response) => response.json())
             .then((json) => json.data)
             .then((response) => {
-                setList(response.components);
+                setList(response.diets);
             })
             .catch((error) => console.error(error))
     }, []);
 
-    const chosenToLocalStorage = async (itemId: number) => {
+    const chosenToLocalStorage = async (dietClicked: any) => {
+
         try {
-            if (chosenList?.find((chosen: number) => chosen === itemId)) {
-                setChosenList(chosenList.filter((item: any) => item !== itemId));
-                await AsyncStorage.setItem('chosen_options', chosenList ? chosenList.filter((item: any) => item !== itemId).join(',') : '')
+            if (dietList?.find((chosen: number) => chosen === dietClicked.diet_id)) {
+                const filteredDiet = dietList.filter((diet: any) => diet !== dietClicked.diet_id);
+                setDietList(filteredDiet);
+                await AsyncStorage.setItem('chosen_diets', filteredDiet.join(','))
+                let resultComponents = dietClicked.xref_diet_2_components.map((component: any) => component.component.component_id);
+                let result = componentList.filter((componentId: any) => !resultComponents.includes(componentId));
+                await AsyncStorage.setItem('chosen_options', result.join(','))
             } else {
-                setChosenList([...chosenList, itemId]);
-                await AsyncStorage.setItem('chosen_options', [...chosenList, itemId].join(','))
+                setDietList([...dietList, dietClicked.diet_id]);
+                await AsyncStorage.setItem('chosen_diets', [...dietList, dietClicked.diet_id].join(','));
+                let dietComponentIds = dietClicked.xref_diet_2_components.map((component: any) => component.component.component_id);
+                let resultComponents: any[] = Array.from(new Set([componentList.concat(dietComponentIds)]));
+                await AsyncStorage.setItem('chosen_options', resultComponents.join(','))
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
         }
     }
 
     return (
-        <View style={{backgroundColor: '#F5FAFA', height: '100%'}}>
+        <View>
             <ScrollView style={styles.view}>
                 {
                     list.map((item: any) => (
-                        <View style={styles.card} key={item.component_id}>
+                        <View style={styles.card} key={item.diet_id}>
                             <Image style={styles.image}
                                    source={{uri: item.image_url}}/>
-                            <Paragraph>{item.component_name}</Paragraph>
+                            <Paragraph>{item.name}</Paragraph>
                             <Checkbox.IOS status={'checked'}
-                                          color={chosenList?.find((chosen: number) => chosen === item.component_id) ? '#41d773' : '#d0cfcf'}
-                                          onPress={() => chosenToLocalStorage(item.component_id)}
+                                          color={dietList?.find((chosen: number) => chosen === item.diet_id) ? '#41d773' : '#d0cfcf'}
+                                          onPress={() => chosenToLocalStorage(item)}
                             />
                         </View>
                     ))
@@ -95,7 +116,7 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
     );
 };
 
-ChooseOptionsScreen.navigationOptions = {
+DietOptionsScreen.navigationOptions = {
     title: '',
     headerStyle: {
         backgroundColor: '#F5FAFA',
@@ -109,10 +130,11 @@ ChooseOptionsScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
     view: {
-        // height: '80%',
-        marginBottom: 125,
+        backgroundColor: '#F5FAFA',
+        height: '100%',
     },
     card: {
+        marginTop: 12,
         marginBottom: 12,
         marginRight: 8,
         marginLeft: 8,

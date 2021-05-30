@@ -27,6 +27,7 @@ const operationsDoc = `
       component {
         component_id
         component_name
+        type
       }
     }
     }
@@ -45,20 +46,7 @@ const IngredientsRoute = ({ingredients}: any) => (
 export const ProductScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
     const layout = useWindowDimensions();
-    const [data, setData]: any = useState({
-        calories: '',
-        carbs: '',
-        composition: '',
-        description: '',
-        fats: '',
-        name: '',
-        proteins: '',
-        storage_conditions_info: '',
-        weight: '',
-        preview_image_url: '',
-        xref_product_2_components: [],
-        product_id: undefined,
-    });
+    const [data, setData]: any = useState();
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
         {key: 'first', title: 'Компоненты'},
@@ -67,22 +55,31 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
     ]);
     const [chosenList, setChosenList]: any = useState([]);
     const [favorites, setFavorites]: any = useState([]);
+    const [baseComponent, setBaseComponent]: any = useState([]);
     const [isFav, setIsFav]: any = useState(false);
+
+    // const found = data?.xref_product_2_components?.some((r: any) => chosenList?.includes(r?.component?.component_id));
+    const found = data?.xref_product_2_components?.filter((r: any) => chosenList?.includes(r?.component?.component_id));
+
 
     const renderScene = ({route}: any) => {
         switch (route.key) {
             case 'first':
                 return (
-                    <OverviewRoute barcode={navigation.state.params}/>
+                    <OverviewRoute barcode={navigation.state.params} baseComponent={baseComponent}
+                                   carbs={data?.carbs}
+                                   fats={data?.fats}
+                                   proteins={data?.proteins}
+                                   calories={data?.calories} found={found}/>
                 );
             case 'second':
-                return <DetailsRoute carbs={data.carbs}
-                                     fats={data.fats}
-                                     proteins={data.proteins}
-                                     weight={data.weight}
-                                     calories={data.calories}/>
+                return <DetailsRoute carbs={data?.carbs}
+                                     fats={data?.fats}
+                                     proteins={data?.proteins}
+                                     weight={data?.weight}
+                                     calories={data?.calories}/>
             case 'third':
-                return <IngredientsRoute ingredients={data.composition}/>
+                return <IngredientsRoute ingredients={data?.composition}/>
             default:
                 return null;
         }
@@ -149,7 +146,8 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
             .then((response) => response.json())
             .then((json) => json.data)
             .then((response) => {
-                setData(response.products[0])
+                setData(response?.products[0]);
+                setBaseComponent(response?.products[0]?.xref_product_2_components.filter((component:any) => component?.component.type !== 'ALLERGEN'));
             })
             .catch((error) => console.error('2', error))
     }, [navigation.state.params]);
@@ -164,8 +162,6 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
         return () => didFocusSubscription.remove();
     }, []);
 
-    const found = data?.xref_product_2_components?.some((r: any) => chosenList?.includes(r?.component?.component_id));
-
     return (
         <View style={styles.view}>
             <View style={styles.card}>
@@ -174,8 +170,8 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
                     fontSize: 18,
                     fontWeight: "bold",
                     textAlign: "center"
-                }}>{data.name}</Title>
-                {found && <View style={styles.avoid}>
+                }}>{data?.name}</Title>
+                {found?.length !== 0 && <View style={styles.avoid}>
                     <SvgAvoid/>
                     <Text style={{color: '#FE6F1C', fontSize: 16, fontWeight: "bold",}}>НЕ РЕКОМЕНДОВАНО</Text>
                 </View>
@@ -190,7 +186,7 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
                     marginRight: 'auto',
                     alignItems: "flex-start"
                 }}>
-                    <Image source={{uri: data.preview_image_url}}
+                    <Image source={{uri: data?.preview_image_url}}
                            style={styles.image}/>
                     <Button onPress={onFavClick} style={{width: 20, right: 6, top: -14,}}>
                         <Icon name={'bookmark'} size={26} style={{display: 'flex'}}

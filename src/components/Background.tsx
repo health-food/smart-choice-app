@@ -5,7 +5,7 @@ import React from 'react'
 export const Background = ({ children } : {children: any}) => {
     return (
         <View style={styles.wrapper}>
-            <LinearGradient colors={['#d49f43', '#fcc80f']} style={styles.container} />
+            <LinearGradient colors={['#F5FAFA', '#F5FAFA']} style={styles.container} />
             {children}
         </View>
     )

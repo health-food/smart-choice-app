@@ -24,7 +24,7 @@ const ScanStack = createStackNavigator(
     },
     {
         navigationOptions: {
-            tabBarLabel: 'Сканировать',
+            tabBarLabel: 'Сканер',
             tabBarIcon: HomeTabBarIcon,
         }
     }
