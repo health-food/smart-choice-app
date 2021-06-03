@@ -1,25 +1,32 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, StyleSheet, Alert} from 'react-native';
+import {Text, View, StyleSheet, Alert, Button} from 'react-native';
 import {BarCodeScanner} from 'expo-barcode-scanner';
+import Spinner from "../../components/spinner/Spinner";
 
 export const BarcodeScan = ({navigation}: any) => {
     const [hasPermission, setHasPermission]: any = useState(null);
-    const [scanned, setScanned] = useState(true);
+    const [scanned, setScanned] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
             const {status} = await BarCodeScanner.requestPermissionsAsync();
             setHasPermission(status === 'granted');
-            if (navigation.isFocused()) {
+        })();
+        const didFocusSubscription = navigation.addListener(
+            'didFocus',
+            (payload: any) => {
                 setScanned(false);
             }
-        })();
-    }, []);
+        );
+        return () => didFocusSubscription.remove();
+    }, [navigation]);
 
     const handleBarCodeScanned = ({type, data}: any) => {
         if (type === 'org.iso.QRCode') {
             return;
         }
+        setLoading(true);
         setScanned(true);
         fetch(
             "http://64.225.106.248/v1/graphql",
@@ -48,17 +55,17 @@ export const BarcodeScan = ({navigation}: any) => {
                 if (response?.products.length) {
                     navigation.navigate('ProductScreen', data);
                 } else {
-                    // alert(`К сожалению, товар не найден`);
                     Alert.alert(
                         "К сожалению, товар не найден",
                         "",
                         [
-                            { text: "OK", onPress: () => setScanned(false)}
+                            {text: "OK", onPress: () => setScanned(false)}
                         ]
                     );
                 }
             })
             .catch((error) => console.error(error))
+            .finally(() => setLoading(false))
     };
 
     if (hasPermission === null) {
@@ -79,6 +86,11 @@ export const BarcodeScan = ({navigation}: any) => {
                     // style={styles.barCodeScanner}
                 >
                     <View style={styles.layerTop}/>
+                    {
+                        loading && <View style={{ top: '17%' }}>
+                            <Spinner color={'#20AF40'} size={400}/>
+                        </View>
+                    }
                     <View style={styles.layerCenter}>
                         <View style={styles.layerLeft}/>
                         <View style={styles.focused}/>

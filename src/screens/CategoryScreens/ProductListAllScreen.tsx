@@ -10,7 +10,7 @@ import {ProductList} from "./ProductList";
 
 const operationsDoc = `
  query MyQuery($_eq: bigint) {
-    products(where: {category_id: {_eq: $_eq}}, limit: 10, offset: 10) {
+    products(where: {category_id: {_eq: $_eq}}, limit: 10) {
       name
       barcode
       preview_image_url

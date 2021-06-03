@@ -7,10 +7,11 @@ import {TabBar, TabView} from 'react-native-tab-view';
 import {OverviewRoute} from "../productScreen/OverviewRoute";
 import {DetailsRoute} from "../productScreen/DetailsRoute";
 import {ProductList} from "./ProductList";
+import Spinner from "../../components/spinner/Spinner";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
-    xref_tag_2_product(where: {tag_id: {_eq: $_eq}}, limit: 10, offset: 10) {
+    xref_tag_2_product(where: {tag_id: {_eq: $_eq}}, limit: 10) {
       product {
         barcode
         name
@@ -24,8 +25,11 @@ const operationsDoc = `
 export const ProductListByTagScreen = ({navigation, route }: any) => {
     const theme = useTheme();
     const [products, setProducts]: any = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setTimeout(() => {
+        }, 2000);
         fetch(
             "http://64.225.106.248/v1/graphql",
             {
@@ -47,7 +51,14 @@ export const ProductListByTagScreen = ({navigation, route }: any) => {
                 setProducts(response.xref_tag_2_product.map((product: any) => product.product));
             })
             .catch((error) => console.error(error))
+            .finally(() => setLoading(false))
     }, []);
+
+    if (loading) {
+        return <View style={{backgroundColor: '#F5FAFA', height: '100%', justifyContent: "center"}}>
+            {/*<Spinner color={'#91bf91'} size={400}/>*/}
+        </View>
+    }
 
     return <ProductList products={products} navigation={navigation}/>
 };

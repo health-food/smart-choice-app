@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import { Button, Share, ScrollView, StyleSheet, TouchableHighlight, View} from 'react-native';
-import { Card, Title} from "react-native-paper";
+import {Button, Share, ScrollView, StyleSheet, TouchableHighlight, View, Text} from 'react-native';
+import {Card, Title} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -107,6 +107,12 @@ export const FavoritesScreen = ({navigation, screenProps}: any) => {
         }
     };
 
+    if (!products.length) {
+        return <View style={{backgroundColor: '#F5FAFA', height: '100%', alignItems:"center"}}>
+            <Text style={{top: '20%', color: '#727171', fontSize: 16,}}>Добавьте свои любимые продукты!</Text>
+        </View>
+    }
+
     return (
         <View style={styles.background}>
             <ScrollView style={styles.view}>
@@ -131,9 +137,12 @@ export const FavoritesScreen = ({navigation, screenProps}: any) => {
                     })
                 }
             </ScrollView>
-            <View style={{marginBottom: 120 }}>
-                <Button onPress={onShare} title="Поделиться" />
-            </View>
+            {
+                products.length &&
+                <View style={{marginBottom: 120}}>
+                    <Button onPress={onShare} title="Поделиться"/>
+                </View>
+            }
         </View>
     );
 };
@@ -182,8 +191,8 @@ const styles = StyleSheet.create({
         width: 90,
     },
     image: {
-        width: 150,
-        height: 150,
+        width: 130,
+        height: 130,
         marginBottom: 8,
     },
     profileImage: {

@@ -43,17 +43,11 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
         }
     };
 
-    // useEffect(() => {
-    // }, [carbs, fats, proteins, calories]);
-
     useEffect(() => {
         getData();
         setGoods(baseComponent.filter((component: any) => component.component.type === 'GOOD'));
         setBad(baseComponent.filter((component: any) => component.component.type === 'BAD'));
     }, []);
-    console.log('___');
-    console.log(typeof calories);
-    console.log(calories);
 
     return (
         <View style={{
@@ -64,10 +58,10 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
             marginLeft: 24,
             marginTop: 18,
         }}>
-            <ScrollView style={{display: "flex", flexDirection: "column"}}>
+            <ScrollView style={{display: "flex", flexDirection: "column", left: 8, top: 8}}>
                 {
-                    good?.map((item: any) =>
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                    good.filter((goodItem: any) => !chosenList.includes(goodItem.component.component_id))?.map((item: any) =>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%'}}>
                             <Checkbox.IOS status={'checked'}
                                           color={'#41d773'}
                             />
@@ -76,7 +70,7 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
                     )
                 }
                 {fatsValue && fats / fatsValue < 0.07 &&
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%'}}>
                             <Checkbox.IOS status={'checked'}
                                           color={'#41d773'}
                             />
@@ -84,7 +78,7 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
                         </View>
                 }
                 {proteinsValue && proteins / proteinsValue >= 0.05 &&
-                <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%'}}>
                     <Checkbox.IOS status={'checked'}
                                   color={'#41d773'}
                     />
@@ -92,7 +86,7 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
                 </View>
                 }
                 {calories < 40 &&
-                <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
+                <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%'}}>
                     <Checkbox.IOS status={'checked'}
                                   color={'#41d773'}
                     />
@@ -101,24 +95,24 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
                 }
                 {
                     bad?.map((item: any) =>
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
-                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%', marginTop: 4}}>
+                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6, marginLeft: 6}}/>
                             <Paragraph>{item?.component?.component_name}</Paragraph>
                         </View>
                     )
                 }
                 {
                     found?.map((item: any) =>
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
-                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%', marginTop: 4}}>
+                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6, marginLeft: 6}}/>
                             <Paragraph>{item?.component?.component_name}</Paragraph>
                         </View>
                     )
                 }
                 {
                     fatsValue && fats / fatsValue >= 0.2 &&
-                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '60%'}}>
-                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6}}/>
+                        <View style={{display: "flex", flexDirection: "row", alignItems: "center", width: '80%', marginTop: 4}}>
+                            <Icon name={'close'} size={23} color={'#d74146'} style={{marginRight: 6, marginLeft: 6}}/>
                             <Paragraph>Повышенное содержание жиров</Paragraph>
                         </View>
                 }

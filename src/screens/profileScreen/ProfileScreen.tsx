@@ -108,7 +108,7 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
     function getDiets() {
         const filteredDiets = diets.filter((diet: any) => dietList.find((chosen: any) => chosen === diet.diet_id));
         if (filteredDiets.length === 0) {
-            return <Text>Nothing is selected yet</Text>;
+            return <Text>Пока ничего не выбрано</Text>;
         }
         return filteredDiets.map((product: any) => {
             return (
@@ -124,7 +124,7 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
     function getComponents() {
         const filteredComponents = components.filter((component: any) => componentList.find((chosen: any) => chosen === component.component_id));
         if (filteredComponents.length === 0) {
-            return <Text>Nothing is selected yet</Text>;
+            return <Text>Пока ничего не выбрано</Text>;
         }
         return filteredComponents.map((product: any) => {
                     return (

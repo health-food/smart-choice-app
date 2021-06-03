@@ -8,6 +8,7 @@ import {OverviewRoute} from "../productScreen/OverviewRoute";
 import {DetailsRoute} from "../productScreen/DetailsRoute";
 import {ProductListByTagScreen} from "./ProductListByTagScreen";
 import {ProductListAllScreen} from "./ProductListAllScreen";
+import Spinner from "../../components/spinner/Spinner";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
@@ -44,6 +45,7 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
     const [tags, setTags] = useState([]);
     const [index, setIndex] = React.useState(0);
     const layout = useWindowDimensions();
+    const [loading, setLoading] = useState(true);
 
     const onProductClick = (barcode: number) => {
         navigation.navigate('ProductScreen', barcode);
@@ -100,6 +102,7 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
                 }));
             })
             .catch((error) => console.error(error))
+            .finally(() => setLoading(false));
     }, []);
 
     const renderTabBar = (props: any) => (
@@ -118,11 +121,18 @@ export const CategoryScreen = ({navigation, screenProps}: any) => {
         }
     };
 
+    if (loading) {
+        return <View style={{backgroundColor: '#F5FAFA', height: '100%', justifyContent: "center"}}>
+            <Spinner color={'#91bf91'} size={400}/>
+        </View>
+    }
+
+
     return (
         <View style={styles.background}>
             <Text style={styles.categoryTitle}>{navigation.state.params.name}</Text>
             {
-                tags.length === 0 && <ProductListAllScreen categoryId={navigation.state.params.id} navigation={navigation}/>
+                !loading && tags.length === 0 && <ProductListAllScreen categoryId={navigation.state.params.id} navigation={navigation}/>
             }
             <TabView renderTabBar={renderTabBar}
                      navigationState={{index, routes: tags}}

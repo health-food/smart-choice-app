@@ -1,10 +1,11 @@
 import * as React from 'react';
-import {Image, ScrollView, StyleSheet, View, Text} from 'react-native';
+import {Image, ScrollView, StyleSheet, View, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {useEffect, useState} from "react";
 import {Button, Card, Searchbar, Title} from "react-native-paper";
 import {FlatGrid, SectionGrid} from "react-native-super-grid";
 import {ProductList} from "./ProductList";
+import Spinner from "../../components/spinner/Spinner";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
@@ -18,7 +19,7 @@ const operationsDoc = `
 
 const searchOperationsDoc = `
   query MyQuery($_ilike: String) {
-    products(where: {name: {_ilike: $_ilike}}, limit: 10, offset: 10) {
+    products(where: {name: {_ilike: $_ilike}}, limit: 10) {
       name
       barcode
       preview_image_url
@@ -36,6 +37,8 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
         image_url: '',
         name: '',
     }]);
+    const [loading, setLoading] = useState(false);
+
     const onCategoryClick = (id: number, name: string) => {
         navigation.navigate('CategoryScreen', {id, name});
     };
@@ -66,6 +69,7 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
     };
 
     useEffect(() => {
+        setLoading(true);
         fetch(
             "http://64.225.106.248/v1/graphql",
             {
@@ -87,7 +91,14 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
                 setCategories(response.categories);
             })
             .catch((error) => console.error(error))
+            .finally(() => setLoading(false))
     }, []);
+
+    if (loading) {
+        return <View style={{backgroundColor: '#F5FAFA', height: '100%', justifyContent: "center"}}>
+            <Spinner color={'#91bf91'} size={400}/>
+        </View>
+    }
 
     return (
         <View style={styles.background}>
@@ -99,7 +110,7 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
             />
             {!searchQuery && <Text style={styles.categoryHeader}>Категории продуктов</Text>}
             {
-                searchQuery ? <ProductList products={products} navigation={navigation} /> :
+                searchQuery ? <ProductList products={products} navigation={navigation}/> :
                     <ScrollView style={styles.view}>
                         <FlatGrid data={categories} itemContainerStyle={{}}
                                   spacing={10}

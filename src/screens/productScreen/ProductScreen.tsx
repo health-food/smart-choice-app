@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Image, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Title} from 'react-native-paper';
 import {TabBar, TabView} from 'react-native-tab-view';
@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SvgAvoid from "../Svg.Avoid";
+import Spinner from "../../components/spinner/Spinner";
 
 const operationsDoc = `
  query MyQuery($_eq: bigint = "") {
@@ -35,12 +36,12 @@ const operationsDoc = `
 `;
 
 const IngredientsRoute = ({ingredients}: any) => (
-    <View
+    <ScrollView
         style={{flex: 1, backgroundColor: '#ffffff', marginTop: 18, borderRadius: 10, marginLeft: 24, marginRight: 24}}>
         <Text style={{marginRight: 8, marginLeft: 8, marginTop: 8, fontSize: 15, lineHeight: 18,}}>
             {ingredients}
         </Text>
-    </View>
+    </ScrollView>
 );
 
 export const ProductScreen = ({navigation, screenProps}: any) => {
@@ -57,10 +58,10 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
     const [favorites, setFavorites]: any = useState([]);
     const [baseComponent, setBaseComponent]: any = useState([]);
     const [isFav, setIsFav]: any = useState(false);
+    const [loading, setLoading] = useState(true);
 
     // const found = data?.xref_product_2_components?.some((r: any) => chosenList?.includes(r?.component?.component_id));
     const found = data?.xref_product_2_components?.filter((r: any) => chosenList?.includes(r?.component?.component_id));
-
 
     const renderScene = ({route}: any) => {
         switch (route.key) {
@@ -150,6 +151,7 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
                 setBaseComponent(response?.products[0]?.xref_product_2_components.filter((component:any) => component?.component.type !== 'ALLERGEN'));
             })
             .catch((error) => console.error('2', error))
+            .finally(()=> setLoading(false))
     }, [navigation.state.params]);
 
     useEffect(() => {
@@ -162,12 +164,20 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
         return () => didFocusSubscription.remove();
     }, []);
 
+    if (loading) {
+        return <View style={{backgroundColor: '#F5FAFA', height: '100%', justifyContent: "center"}}>
+            <Spinner color={'#91bf91'} size={400}/>
+        </View>
+    }
+
     return (
         <View style={styles.view}>
             <View style={styles.card}>
                 <Title style={{
-                    width: '100%',
+                    maxWidth: '100%',
                     fontSize: 18,
+                    marginLeft: 8,
+                    marginRight: 8,
                     fontWeight: "bold",
                     textAlign: "center"
                 }}>{data?.name}</Title>
@@ -214,7 +224,7 @@ ProductScreen.navigationOptions = {
             height: 0,
         },
     },
-    headerTintColor: '#A8A8A8',
+    headerTintColor: '#4E4E53',
     headerBackTitleVisible: false,
 }
 

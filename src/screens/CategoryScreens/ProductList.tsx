@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View, Text} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Button, Card, Title} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -21,6 +21,12 @@ export const ProductList = ({navigation, products }: any) => {
         navigation.navigate('ProductScreen', barcode);
     };
 
+    if (!products.length) {
+        return <View style={{ alignItems: "center"}}>
+            <Text style={{ fontSize: 16, color: '#727171'}}>Ничего не найдено</Text>
+        </View>
+    }
+
     return (
         <View style={styles.background}>
             <ScrollView style={styles.view}>
@@ -31,7 +37,7 @@ export const ProductList = ({navigation, products }: any) => {
                                 <Card.Content style={styles.header}>
                                     <Card.Cover style={styles.image}
                                                 source={{uri: product.preview_image_url}}/>
-                                    <Title style={{fontSize: 14, width: 270, }}>{product.name}</Title>
+                                    <Title style={{fontSize: 14, width: '64%' }}>{product.name}</Title>
                                 </Card.Content>
                             </Card>
                         )
@@ -87,8 +93,8 @@ const styles = StyleSheet.create({
         width: 90,
     },
     image: {
-        width: 120,
-        height: 120,
+        width: 110,
+        height: 110,
         marginBottom: 8,
     },
     profileImage: {
