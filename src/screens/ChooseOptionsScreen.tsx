@@ -67,7 +67,7 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
                 await AsyncStorage.setItem('chosen_options', chosenList ? chosenList.filter((item: any) => item !== itemId).join(',') : '')
             } else {
                 setChosenList([...chosenList, itemId]);
-                await AsyncStorage.setItem('chosen_options', [...chosenList, itemId].join(','))
+                await AsyncStorage.setItem('chosen_options', [...chosenList, itemId].join(','));
             }
         } catch (e) {
             console.log(e);
