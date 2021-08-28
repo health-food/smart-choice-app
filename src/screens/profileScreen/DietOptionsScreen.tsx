@@ -146,9 +146,10 @@ const styles = StyleSheet.create({
 
     },
     image: {
-        width: 70,
-        height: 70,
+        width: 100,
+        height: 80,
         marginRight: 12,
+        borderRadius: 10,
     },
 
 })

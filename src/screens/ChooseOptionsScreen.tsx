@@ -1,13 +1,13 @@
 import * as React from 'react';
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Card, Title, Paragraph, Button, Checkbox} from 'react-native-paper';
 import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const operationsDoc = `
-  query MyQuery($_eq: bigint = "") {
-    components {
+  query MyQuery {
+     components(where: {type: {_eq: ALLERGEN}}) {
       component_id
       component_name
       image_url
@@ -79,15 +79,15 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
             <ScrollView style={styles.view}>
                 {
                     list.map((item: any) => (
-                        <View style={styles.card} key={item.component_id}>
+                        <TouchableOpacity style={styles.card} key={item.component_id} activeOpacity={0.4}
+                                          onPress={() => chosenToLocalStorage(item.component_id)} >
                             <Image style={styles.image}
                                    source={{uri: item.image_url}}/>
                             <Paragraph>{item.component_name}</Paragraph>
                             <Checkbox.IOS status={'checked'}
                                           color={chosenList?.find((chosen: number) => chosen === item.component_id) ? '#41d773' : '#d0cfcf'}
-                                          onPress={() => chosenToLocalStorage(item.component_id)}
                             />
-                        </View>
+                        </TouchableOpacity>
                     ))
                 }
             </ScrollView>
@@ -110,6 +110,7 @@ ChooseOptionsScreen.navigationOptions = {
 const styles = StyleSheet.create({
     view: {
         // height: '80%',
+        backgroundColor: '#F5FAFA',
         marginBottom: 125,
     },
     card: {
@@ -124,9 +125,10 @@ const styles = StyleSheet.create({
 
     },
     image: {
-        width: 70,
-        height: 70,
+        width: 100,
+        height: 80,
         marginRight: 12,
+        borderRadius: 10,
     },
 
 })

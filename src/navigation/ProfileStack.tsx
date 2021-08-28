@@ -11,7 +11,7 @@ import {DietOptionsScreen} from "../screens/profileScreen/DietOptionsScreen";
 const HomeTabBarIcon = ({ focused }: any) => <SvgHome active={focused} />;
 HomeTabBarIcon.propTypes = {
     // required
-    focused: PropTypes.bool.isRequired
+    focused: PropTypes.bool.isRequired,
 };
 
 const ProfileStack = createStackNavigator(
