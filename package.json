@@ -52,7 +52,7 @@
   "private": true,
   "husky": {
     "hooks": {
-      "pre-push": "echo emil"
+      "pre-push": "echo emil && expo publish"
     }
   }
 }
