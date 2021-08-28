@@ -20,7 +20,7 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
     const getData = async () => {
         try {
             await AsyncStorage.getItem('calories', (errs, result) => {
-                if (result !== undefined) {
+                if (result) {
                     setCalorieValue(parseInt(result));
                     setProteinsValue(Math.floor(parseInt(result) * 0.3 / 4));
                     setFatsValue(Math.floor(parseInt(result) * 0.3 / 9));
@@ -33,7 +33,7 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
                 }
             });
             await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result !== null) {
+                if (result) {
                     setChosenList(result ? result?.split(',').map(x => +x) : []);
                 }
             })
