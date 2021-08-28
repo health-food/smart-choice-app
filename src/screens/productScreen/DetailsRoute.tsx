@@ -30,7 +30,6 @@ export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => 
             })
         } catch (e) {
             console.log(e);
-            // error reading value
         }
     };
 

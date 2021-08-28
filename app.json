@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "smart-choice",
+    "owner": "health-food",
     "slug": "smart-choice",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,9 +18,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "org.healthFood.smartChoice",
+      "buildNumber": "1.0.0"
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
