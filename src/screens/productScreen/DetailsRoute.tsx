@@ -16,7 +16,7 @@ export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => 
     const getData = async () => {
         try {
             await AsyncStorage.getItem('calories', (errs, result) => {
-                if (result !== undefined) {
+                if (result) {
                     setCalorieValue(parseInt(result));
                     setProteinsValue(Math.floor(parseInt(result) * 0.3 / 4));
                     setFatsValue(Math.floor(parseInt(result) * 0.3 / 9));
@@ -24,9 +24,8 @@ export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => 
                 }
             });
             await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                // console.log(result);
-                if (result !== null) {
-                    setChosenList(result ? result?.split(',').map(x => +x) : []);
+                if (result) {
+                    setChosenList(result?.split(',').map(x => +x) );
                 }
             })
         } catch (e) {
