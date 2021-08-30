@@ -62,11 +62,42 @@ export const BarcodeScan = ({navigation}: any) => {
                             {text: "OK", onPress: () => setScanned(false)}
                         ]
                     );
+                    console.log('ненайденный штрихкод', data);
+                    saveNotFoundBarCode(data);
                 }
             })
             .catch((error) => console.error(error))
             .finally(() => setLoading(false))
     };
+
+  const saveNotFoundBarCode = (barcode: number) => {
+    fetch(
+        "http://64.225.106.248/v1/graphql",
+        {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
+          },
+          body: JSON.stringify({
+            query: `
+  mutation insert_not_found_barcodes($object: not_found_barcodes_insert_input!) {
+    insert_not_found_barcodes_one(object: $object) {
+      id
+    }
+  }
+`, operationName: 'insert_not_found_barcodes',
+            variables: {"object": {barcode: barcode}}
+          })
+        }
+    )
+    .then((response) => response.json())
+    .then((json) => json.data)
+    .then((response) => {
+      console.log(`ненайденный штрихкод сохранен, id=${response.insert_not_found_barcodes_one.id}`);
+    })
+    .catch((error) => console.error(error));
+  }
 
     if (hasPermission === null) {
         return <Text>Requesting for camera permission</Text>;
