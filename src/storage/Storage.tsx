@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NAME_KEY = 'name';
-const CHOSEN_DIETS_KEY = 'chosen_diets';
-const CHOSEN_COMPONENTS_KEY = 'chosen_components';
+const CHOSEN_DIETS_KEY = '@chosen_diets';
+const CHOSEN_COMPONENTS_KEY = '@chosen_components';
 
 const getArray = async (key: string) => {
     try {
