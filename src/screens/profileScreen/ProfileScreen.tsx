@@ -1,14 +1,11 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Button, Card, Paragraph, Title} from 'react-native-paper';
 import {Background} from "../../components/Background";
-import Icon from 'react-native-vector-icons/Feather';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {err} from "react-native-svg/lib/typescript/xml";
-import SvgFavorite from "../../navigation/Svg.Favorite";
 import SvgAvatar from "./Svg.Avatar";
+import {storage} from "../../storage/Storage";
 
 const operationsDoc = `
   query MyQuery {
@@ -50,32 +47,10 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
     const [componentList, setComponentList]: any = useState([]);
     const [dietList, setDietList]: any = useState([]);
 
-    const getChosen = async () => {
-        // await AsyncStorage.removeItem('chosen_options');
-        try {
-            await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result !== null) {
-                    setComponentList(result ? result?.split(',').map(x => +x) : []);
-                } else {
-                    setComponentList([]);
-                }
-            })
-            await AsyncStorage.getItem('chosen_diets', (errs, result) => {
-                if (result !== null) {
-                    setDietList(result ? result?.split(',').map(x => +x) : []);
-                } else {
-                    setDietList([]);
-                }
-            })
-            await AsyncStorage.getItem('name', (errs, result) => {
-                if (result !== null) {
-                    setName(result);
-                }
-            })
-        } catch (e) {
-            console.log(e);
-            // error reading value
-        }
+    const getChosen =  () => {
+        storage.getChosenDiets().then(chosenDiets => setDietList(chosenDiets));
+        storage.getChosenComponents().then(chosenComponents => setComponentList(chosenComponents));
+        storage.getName().then(name => setName(name));
     };
 
 
@@ -145,12 +120,11 @@ export const ProfileScreen = ({navigation, screenProps}: any) => {
                 </Text>
             </View>;
         }
-        return filteredComponents.map((product: any) => {
+        return filteredComponents.map((component: any) => {
             return (
-                <Card style={styles.product} key={product.id}>
-                    <Card.Cover style={styles.image}
-                                source={{uri: product.image_url}}/>
-                    <Paragraph>{product.component_name}</Paragraph>
+                <Card style={styles.product} key={component.component_id}>
+                    <Card.Cover style={styles.image} source={{uri: component.image_url}}/>
+                    <Paragraph>{component.component_name}</Paragraph>
                 </Card>
             )
         });

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {useEffect, useState} from 'react';
+import {Image, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTheme} from 'react-navigation';
-import {Card, Title, Paragraph, Button, Checkbox} from 'react-native-paper';
-import {useEffect, useState} from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Checkbox, Paragraph} from 'react-native-paper';
+import {storage} from "../storage/Storage";
 
 const operationsDoc = `
   query MyQuery {
@@ -20,19 +20,8 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
     const [list, setList]: any = useState([]);
     const [chosenList, setChosenList]: any = useState([]);
 
-    const getChosen = async () => {
-        // await AsyncStorage.removeItem('chosen_options');
-        try {
-            await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result !== null) {
-                    setChosenList(result ? result?.split(',').map(x=>+x) : []);
-                }
-            })
-
-        } catch (e) {
-            console.log(e);
-            // error reading value
-        }
+    const getChosen = () => {
+        storage.getChosenComponents().then(chosen => setChosenList(chosen));
     };
 
     useEffect(() => {
@@ -61,18 +50,14 @@ export const ChooseOptionsScreen = ({navigation, screenProps}: any) => {
     }, []);
 
     const chosenToLocalStorage = async (itemId: number) => {
-        try {
-            if (chosenList?.find((chosen: number) => chosen === itemId)) {
-                setChosenList(chosenList.filter((item: any) => item !== itemId));
-                await AsyncStorage.setItem('chosen_options', chosenList ? chosenList.filter((item: any) => item !== itemId).join(',') : '')
-            } else {
-                setChosenList([...chosenList, itemId]);
-                await AsyncStorage.setItem('chosen_options', [...chosenList, itemId].join(','))
-            }
-        } catch (e) {
-            console.log(e);
+        if (chosenList?.find((chosen: number) => chosen === itemId)) {
+            setChosenList(chosenList.filter((item: any) => item !== itemId));
+            await storage.setChosenComponents(chosenList ? chosenList.filter((item: any) => item !== itemId) : [])
+        } else {
+            setChosenList([...chosenList, itemId]);
+            await storage.setChosenComponents([...chosenList, itemId])
         }
-    }
+    };
 
     return (
         <View style={{backgroundColor: '#F5FAFA', height: '100%'}}>

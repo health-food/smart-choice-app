@@ -1,9 +1,47 @@
 import * as React from 'react';
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {useEffect, useState} from 'react';
+import {Image, ScrollView, StyleSheet, View} from 'react-native';
 import {useTheme} from 'react-navigation';
-import {Card, Title, Paragraph, Button, Checkbox} from 'react-native-paper';
-import {useEffect, useState} from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Checkbox, Paragraph} from 'react-native-paper';
+import {storage} from "../../storage/Storage";
+
+const notInList = (list: any) => (elem: any) => {
+    return !list.find((id: any) => id === elem);
+};
+
+
+const merge = (f: any, s: any) => {
+    return Array.from(new Set([...f, ...s]));
+};
+
+const convertArrayToObject = (array: any, key: any) =>
+    array.reduce(
+        (obj: any, item: any) => ({
+            ...obj,
+            [item[key]]: item
+        }),
+        {}
+    );
+const fetchAllDietsList = async () => {
+    return fetch(
+        "http://64.225.106.248/v1/graphql",
+        {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
+            },
+            body: JSON.stringify({
+                query: operationsDoc,
+                variables: {},
+                operationName: 'MyQuery'
+            })
+        }
+    )
+        .then((response) => response.json())
+        .then((json) => json.data)
+        .then((response) => response.diets)
+};
 
 const operationsDoc = `
   query MyQuery {
@@ -22,95 +60,89 @@ const operationsDoc = `
   }
 `;
 
+
 export const DietOptionsScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
-    const [list, setList]: any = useState([]);
-    const [componentList, setComponentList]: any = useState([]);
     const [dietList, setDietList]: any = useState([]);
+    const [chosenComponentList, setChosenComponentList]: any = useState([]);
+    const [chosenDietList, setChosenDietList]: any = useState([]);
 
-    const getChosen = async () => {
-        // await AsyncStorage.removeItem('chosen_options');
-        try {
-            await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result !== null) {
-                    setComponentList(result ? result?.split(',').map(x=>+x) : []);
-                }
-            })
-            await AsyncStorage.getItem('chosen_diets', (errs, result) => {
-                if (result !== null) {
-                    setDietList(result ? result?.split(',').map(x=>+x) : []);
-                }
-            })
-
-        } catch (e) {
-            console.log(e);
-            // error reading value
-        }
-    };
+    const dietsById = convertArrayToObject(dietList, 'diet_id');
 
     useEffect(() => {
-        getChosen();
-            fetch(
-            "http://64.225.106.248/v1/graphql",
-            {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
-                },
-                body: JSON.stringify({
-                    query: operationsDoc,
-                    variables: {},
-                    operationName: 'MyQuery'
-                })
-            }
-        )
-            .then((response) => response.json())
-            .then((json) => json.data)
-            .then((response) => {
-                setList(response.diets);
-            })
-            .catch((error) => console.error(error))
+        storage.getChosenDiets().then(chosenDiets => setChosenDietList(chosenDiets));
+        storage.getChosenComponents().then(chosenComponents => setChosenComponentList(chosenComponents));
+        fetchAllDietsList()
+            .then(diets => setDietList(diets))
+            .catch(error => console.error(error))
+        // todo; save в локал storage на уход с вкладки
     }, []);
 
-    const chosenToLocalStorage = async (dietClicked: any) => {
+    const getComponentsIdsByDietId = (diet_id: any) => {
+        return dietsById[diet_id].xref_diet_2_components.map((component: any) => component.component.component_id);
+    };
 
-        try {
-            if (dietList?.find((chosen: number) => chosen === dietClicked.diet_id)) {
-                const filteredDiet = dietList.filter((diet: any) => diet !== dietClicked.diet_id);
-                setDietList(filteredDiet);
-                await AsyncStorage.setItem('chosen_diets', filteredDiet.join(','))
-                let resultComponents = dietClicked.xref_diet_2_components.map((component: any) => component.component.component_id);
-                let result = componentList.filter((componentId: any) => !resultComponents.includes(componentId));
-                await AsyncStorage.setItem('chosen_options', result.join(','))
-            } else {
-                setDietList([...dietList, dietClicked.diet_id]);
-                await AsyncStorage.setItem('chosen_diets', [...dietList, dietClicked.diet_id].join(','));
-                let dietComponentIds = dietClicked.xref_diet_2_components.map((component: any) => component.component.component_id);
-                let resultComponents: any[] = Array.from(new Set([componentList.concat(dietComponentIds)]));
-                await AsyncStorage.setItem('chosen_options', resultComponents.join(','))
-            }
-        } catch (e) {
-            console.error(e);
+    const getComponentIdsToDelete = (dietComponentsIds:any, otherDietsIds:any) => {
+        const otherDietComponentIds = merge(otherDietsIds.flatMap(getComponentsIdsByDietId), []);
+        console.log("otherDietComponentIds");
+        console.log(otherDietComponentIds);
+        console.log("dietComponentsIds");
+        console.log(dietComponentsIds);
+        var filter = dietComponentsIds.filter(notInList(otherDietComponentIds));
+        console.log("filter");
+        console.log(filter);
+        return filter;
+    };
+
+
+    const onDietClick = async (diet_id: any, isChecked: boolean) => {
+        const dietComponentsIds = getComponentsIdsByDietId(diet_id);
+        let chosenComponentIds;
+        let dietIds;
+
+        if (isChecked) {
+            dietIds = merge(chosenDietList, [diet_id]);
+            chosenComponentIds = merge(chosenComponentList, dietComponentsIds);
+        } else {
+            dietIds = chosenDietList.filter((d_id: any) => d_id != diet_id);
+            const componentIdsToDelete = getComponentIdsToDelete(dietComponentsIds, dietIds);
+            chosenComponentIds = chosenComponentList.filter(notInList(componentIdsToDelete));
         }
-    }
+
+        setChosenDietList(dietIds);
+        setChosenComponentList(chosenComponentIds);
+
+        await storage.setChosenDiets(dietIds);
+        await storage.setChosenComponents(chosenComponentIds);
+    };
+
+    const renderedList = dietList
+        .map((diet: any) => {
+            return {
+                ...diet,
+                isChecked: chosenDietList.find((chosen: number) => chosen === diet.diet_id)
+            }
+        });
 
     return (
         <View>
             <ScrollView style={styles.view}>
-                {
-                    list.map((item: any) => (
-                        <View style={styles.card} key={item.diet_id}>
-                            <Image style={styles.image}
-                                   source={{uri: item.image_url}}/>
-                            <Paragraph>{item.name}</Paragraph>
-                            <Checkbox.IOS status={'checked'}
-                                          color={dietList?.find((chosen: number) => chosen === item.diet_id) ? '#41d773' : '#d0cfcf'}
-                                          onPress={() => chosenToLocalStorage(item)}
-                            />
-                        </View>
-                    ))
-                }
+                {renderedList.map((diet: any) => (
+                    <View style={styles.card} key={diet.diet_id}>
+                        <Image
+                            style={styles.image}
+                            source={{uri: diet.image_url}}
+                        />
+                        <Paragraph>
+                            {diet.name}
+                        </Paragraph>
+                        <Checkbox.IOS
+                            status={'checked'}
+                            color={diet.isChecked ? '#41d773' : '#d0cfcf'}
+                            onPress={() => onDietClick(diet.diet_id, !diet.isChecked)}
+                        />
+                    </View>
+                ))}
             </ScrollView>
         </View>
     );
@@ -126,7 +158,7 @@ DietOptionsScreen.navigationOptions = {
             height: 0,
         },
     },
-}
+};
 
 const styles = StyleSheet.create({
     view: {
@@ -152,4 +184,4 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
 
-})
+});
