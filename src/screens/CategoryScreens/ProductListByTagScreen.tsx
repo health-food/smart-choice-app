@@ -1,17 +1,12 @@
 import * as React from 'react';
-import {ImageBackground, ScrollView, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
+import {useEffect, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {useTheme} from 'react-navigation';
-import {useEffect, useState} from "react";
-import {Button, Card, Paragraph, Title} from "react-native-paper";
-import {TabBar, TabView} from 'react-native-tab-view';
-import {OverviewRoute} from "../productScreen/OverviewRoute";
-import {DetailsRoute} from "../productScreen/DetailsRoute";
 import {ProductList} from "./ProductList";
-import Spinner from "../../components/spinner/Spinner";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
-    xref_tag_2_product(where: {tag_id: {_eq: $_eq}}, limit: 10) {
+    xref_tag_2_product(where: {tag_id: {_eq: $_eq}}) {
       product {
         barcode
         name

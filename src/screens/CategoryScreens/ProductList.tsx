@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, View, Text} from 'react-native';
+import {SafeAreaView, StyleSheet, View, Text, FlatList} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Button, Card, Title} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -29,21 +29,22 @@ export const ProductList = ({navigation, products }: any) => {
 
     return (
         <View style={styles.background}>
-            <ScrollView style={styles.view}>
-                {
-                    products.map((product: any) => {
-                        return (
-                            <Card key={product.product_id} style={styles.mainCard} onPress={() => onProductClick(product.barcode)}>
-                                <Card.Content style={styles.header}>
-                                    <Card.Cover style={styles.image}
-                                                source={{uri: product.preview_image_url}}/>
-                                    <Title style={{fontSize: 14, width: '64%' }}>{product.name}</Title>
-                                </Card.Content>
-                            </Card>
-                        )
-                    })
-                }
-            </ScrollView>
+            <SafeAreaView style={styles.view}>
+                <FlatList
+                    data={products}
+                    renderItem={({item}) => {
+                        return <Card style={styles.mainCard}
+                                     onPress={() => onProductClick(item.barcode)}>
+                            <Card.Content style={styles.header}>
+                                <Card.Cover style={styles.image}
+                                            source={{uri: item.preview_image_url}}/>
+                                <Title style={{fontSize: 14, width: '64%'}}>{item.name}</Title>
+                            </Card.Content>
+                        </Card>
+                    }}
+                    keyExtractor={item => item.product_id}
+                />
+            </SafeAreaView>
         </View>
     );
 };

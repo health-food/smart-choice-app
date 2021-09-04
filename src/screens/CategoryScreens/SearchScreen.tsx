@@ -19,7 +19,7 @@ const operationsDoc = `
 
 const searchOperationsDoc = `
   query MyQuery($_ilike: String) {
-    products(where: {name: {_ilike: $_ilike}}, limit: 10) {
+    products(where: {name: {_ilike: $_ilike}}) {
       name
       barcode
       preview_image_url
