@@ -11,6 +11,7 @@ import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SvgAvoid from "../Svg.Avoid";
 import Spinner from "../../components/spinner/Spinner";
+import {storage} from "../../storage/Storage";
 
 const operationsDoc = `
  query MyQuery($_eq: bigint = "") {
@@ -97,11 +98,7 @@ export const ProductScreen = ({navigation, screenProps}: any) => {
 
     const getData = async () => {
         try {
-            await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result !== null) {
-                    setChosenList(result ? result?.split(',').map(x => +x) : []);
-                }
-            })
+            storage.getChosenComponents().then(chosenComponents => setChosenList(chosenComponents));
             await AsyncStorage.getItem('favorites', (errs, result) => {
                 if (result !== null) {
                     const favs: any[] = result?.split(',').map(x => +x) || [];

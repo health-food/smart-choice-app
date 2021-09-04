@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useEffect, useState} from "react";
 import {ProgressBar, Colors} from 'react-native-paper';
 import {ProgressBarComponent} from "./ProgressBarComponent";
+import {storage} from "../../storage/Storage";
 
 export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => {
     const [calorieValue, setCalorieValue]: [number, any] = useState(2000);
@@ -23,11 +24,7 @@ export const DetailsRoute = ({carbs, fats, proteins, calories, weight}: any) => 
                     setCarbsValue(Math.floor(parseInt(result) * 0.4 / 4));
                 }
             });
-            await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result) {
-                    setChosenList(result?.split(',').map(x => +x) );
-                }
-            })
+            storage.getChosenComponents().then(chosenComponents => setChosenList(chosenComponents));
         } catch (e) {
             console.log(e);
         }

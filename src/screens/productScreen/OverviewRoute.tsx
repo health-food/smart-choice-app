@@ -7,6 +7,7 @@ import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {storage} from "../../storage/Storage";
 
 export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, proteins, calories}: any) => {
     const [calorieValue, setCalorieValue]: [number | undefined, any] = useState();
@@ -32,11 +33,7 @@ export const OverviewRoute = ({barcode,found, baseComponent, carbs, fats, protei
                     setCarbsValue(200);
                 }
             });
-            await AsyncStorage.getItem('chosen_options', (errs, result) => {
-                if (result) {
-                    setChosenList(result?.split(',').map(x => +x));
-                }
-            })
+            storage.getChosenComponents().then(chosenComponents => setChosenList(chosenComponents));
         } catch (e) {
             console.log(e);
             // error reading value
