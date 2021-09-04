@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Image, ScrollView, StyleSheet, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTheme} from 'react-navigation';
 import {Checkbox, Paragraph} from 'react-native-paper';
 import {storage} from "../../storage/Storage";
@@ -84,13 +84,7 @@ export const DietOptionsScreen = ({navigation, screenProps}: any) => {
 
     const getComponentIdsToDelete = (dietComponentsIds:any, otherDietsIds:any) => {
         const otherDietComponentIds = merge(otherDietsIds.flatMap(getComponentsIdsByDietId), []);
-        console.log("otherDietComponentIds");
-        console.log(otherDietComponentIds);
-        console.log("dietComponentsIds");
-        console.log(dietComponentsIds);
         var filter = dietComponentsIds.filter(notInList(otherDietComponentIds));
-        console.log("filter");
-        console.log(filter);
         return filter;
     };
 
@@ -128,7 +122,8 @@ export const DietOptionsScreen = ({navigation, screenProps}: any) => {
         <View>
             <ScrollView style={styles.view}>
                 {renderedList.map((diet: any) => (
-                    <View style={styles.card} key={diet.diet_id}>
+                    <TouchableOpacity style={styles.card} key={diet.component_id} activeOpacity={0.4}
+                                      onPress={() => onDietClick(diet.diet_id, !diet.isChecked)} >
                         <Image
                             style={styles.image}
                             source={{uri: diet.image_url}}
@@ -139,9 +134,8 @@ export const DietOptionsScreen = ({navigation, screenProps}: any) => {
                         <Checkbox.IOS
                             status={'checked'}
                             color={diet.isChecked ? '#41d773' : '#d0cfcf'}
-                            onPress={() => onDietClick(diet.diet_id, !diet.isChecked)}
                         />
-                    </View>
+                    </TouchableOpacity>
                 ))}
             </ScrollView>
         </View>
