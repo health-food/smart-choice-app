@@ -62,7 +62,6 @@ export const BarcodeScan = ({navigation}: any) => {
                             {text: "OK", onPress: () => setScanned(false)}
                         ]
                     );
-                    console.log('ненайденный штрихкод', data);
                     saveNotFoundBarCode(data);
                 }
             })

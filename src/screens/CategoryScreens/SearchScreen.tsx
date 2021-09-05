@@ -6,6 +6,7 @@ import {Button, Card, Searchbar, Title} from "react-native-paper";
 import {FlatGrid, SectionGrid} from "react-native-super-grid";
 import {ProductList} from "./ProductList";
 import Spinner from "../../components/spinner/Spinner";
+import useDebounced from "../../helpers/useDebounced";
 
 const operationsDoc = `
   query MyQuery($_eq: bigint = "") {
@@ -30,7 +31,6 @@ const searchOperationsDoc = `
 
 export const SearchScreen = ({navigation, screenProps}: any) => {
     const theme = useTheme();
-    const [searchQuery, setSearchQuery] = React.useState('');
     const [products, setProducts] = useState([]);
     const [categories, setCategories]: any = useState([{
         category_id: 0,
@@ -39,33 +39,16 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
     }]);
     const [loading, setLoading] = useState(false);
 
+    const [searchValue, setSearchValue] = useState('');
+    const [debounced, setDebounced] = useDebounced(searchValue, 800);
+
     const onCategoryClick = (id: number, name: string) => {
         navigation.navigate('CategoryScreen', {id, name});
     };
 
-    const onSearchInput = (query: string) => {
-        setSearchQuery(query);
-        fetch(
-            "http://64.225.106.248/v1/graphql",
-            {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
-                },
-                body: JSON.stringify({
-                    query: searchOperationsDoc,
-                    variables: {'_ilike': `%${query}%`},
-                    operationName: 'MyQuery'
-                })
-            }
-        )
-            .then((response) => response.json())
-            .then((json) => json.data)
-            .then((response) => {
-                setProducts(response.products);
-            })
-            .catch((error) => console.error(error))
+    const onSearchValueChange = (value: string) => {
+        setSearchValue(value);
+        setDebounced(value);
     };
 
     useEffect(() => {
@@ -94,6 +77,31 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
             .finally(() => setLoading(false))
     }, []);
 
+    useEffect(() => {
+        console.log(debounced);
+        fetch(
+            "http://64.225.106.248/v1/graphql",
+            {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-hasura-admin-secret': 'rj0PaUGIirrkaOJu034H',
+                },
+                body: JSON.stringify({
+                    query: searchOperationsDoc,
+                    variables: {'_ilike': `%${debounced}%`},
+                    operationName: 'MyQuery'
+                })
+            }
+        )
+            .then((response) => response.json())
+            .then((json) => json.data)
+            .then((response) => {
+                setProducts(response.products);
+            })
+            .catch((error) => console.error(error))
+    }, [debounced]);
+
     if (loading) {
         return <View style={{backgroundColor: '#F5FAFA', height: '100%', justifyContent: "center"}}>
             <Spinner color={'#91bf91'} size={400}/>
@@ -104,13 +112,13 @@ export const SearchScreen = ({navigation, screenProps}: any) => {
         <View style={styles.background}>
             <Searchbar
                 placeholder="Поиск по продуктам"
-                onChangeText={(query) => onSearchInput(query)}
-                value={searchQuery}
+                onChangeText={onSearchValueChange}
+                value={searchValue}
                 style={styles.input} inputStyle={{fontSize: 16}}
             />
-            {!searchQuery && <Text style={styles.categoryHeader}>Категории продуктов</Text>}
+            {!debounced && <Text style={styles.categoryHeader}>Категории продуктов</Text>}
             {
-                searchQuery ? <ProductList products={products} navigation={navigation}/> :
+                debounced ? <ProductList products={products} navigation={navigation}/> :
                     <ScrollView style={styles.view}>
                         <FlatGrid data={categories} itemContainerStyle={{}}
                                   spacing={10}
