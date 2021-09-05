@@ -38,7 +38,8 @@ const operationsDoc = `
 
 const IngredientsRoute = ({ingredients}: any) => (
     <ScrollView
-        style={{flex: 1, backgroundColor: '#ffffff', marginTop: 18, borderRadius: 10, marginLeft: 24, marginRight: 24}}>
+        style={{flex: 1, backgroundColor: '#ffffff', marginTop: 18, marginBottom: '30%',
+            borderRadius: 10, marginLeft: 24, marginRight: 24}}>
         <Text style={{marginRight: 8, marginLeft: 8, marginTop: 8, fontSize: 15, lineHeight: 18,}}>
             {ingredients}
         </Text>
