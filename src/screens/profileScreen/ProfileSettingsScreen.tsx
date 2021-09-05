@@ -190,9 +190,9 @@ const styles = StyleSheet.create({
         height: '100%'
     },
     scrollview: {
-        marginRight: 24,
+        marginRight: '5%',
         marginTop: 15,
-        marginLeft: 24,
+        marginLeft: '5%',
     },
     profileImage: {
         borderColor: '#fff',
